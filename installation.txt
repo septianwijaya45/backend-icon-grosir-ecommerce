@@ -1,0 +1,18 @@
+npm i express express-async-handler cors jsonwebtoken bcrypt nodemon dotenv sequelize sequelize-cli multer
+
+// create user 
+npx sequelize-cli model:generate --name User --attributes name:string,email:string,password:string
+
+// create departement
+npx sequelize-cli model:generate --name Departement --attributes departementId:integer,departementN
+ame:string,managerId:integer
+
+// create manager
+
+// membuat migrasi
+npx sequelize-cli migration:generate --name create_users_table
+
+// db migrate
+npx sequelize-cli db:migrate
+//
+npx sequelize-cli db:migrate:undo:all
