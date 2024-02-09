@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     /**
@@ -12,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "role_id",
         as: "Roles",
       });
-      Users.hasOne(modes.M_Admins, {
+      Users.hasOne(models.M_Admins, {
         foreignKey: "user_id",
         as: "M_Admins",
       });
@@ -30,7 +31,17 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Users",
+      hooks: {
+        beforeSave: async (user) => {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        },
+      },
     }
   );
+
+  Users.prototype.matchPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
   return Users;
 };

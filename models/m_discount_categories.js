@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      M_Discount_Categories.belongsTo(modes.M_Categories, {
+      M_Discount_Categories.belongsTo(models.M_Categories, {
         foreignKey: "category_id",
         as: "M_Categories",
       });

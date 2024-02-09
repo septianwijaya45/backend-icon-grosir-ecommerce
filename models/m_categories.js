@@ -8,11 +8,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      M_Categories.hasOne(modes.M_Products, {
+      M_Categories.hasOne(models.M_Products, {
         foreignKey: "category_id",
         as: "M_Products",
       });
-      M_Categories.hasOne(modes.M_Discount_Categories, {
+      M_Categories.hasOne(models.M_Discount_Categories, {
         foreignKey: "category_id",
         as: "M_Discount_Categories",
       });

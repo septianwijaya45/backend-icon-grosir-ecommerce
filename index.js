@@ -13,6 +13,11 @@ const PORT = process.env.PORT || 3030;
 global.__basedir = __dirname;
 
 // *** ROUTES *** //
+// deklarasi route
+const adminUser = require("./routes/UserAdminRoute");
+
+// route
+app.use("/api/admin", adminUser);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {

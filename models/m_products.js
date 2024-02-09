@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         through: "M_Tag_Products",
         foreignKey: "product_id",
       });
-      M_Categories.belongsTo(models.M_Sizes, {
+      M_Products.belongsTo(models.M_Sizes, {
         foreignKey: "category_id",
         as: "M_Categories",
       });
