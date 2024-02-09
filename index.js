@@ -16,10 +16,12 @@ global.__basedir = __dirname;
 // deklarasi route
 const adminUser = require("./routes/UserAdminRoute");
 const variant = require("./routes/VariantionRoute");
+const category = require("./routes/CategoryRoute");
 
 // route
 app.use("/api/admin", adminUser);
 app.use("/api/variant", variant);
+app.use("/api/category", category);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {
