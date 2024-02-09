@@ -15,9 +15,11 @@ global.__basedir = __dirname;
 // *** ROUTES *** //
 // deklarasi route
 const adminUser = require("./routes/UserAdminRoute");
+const variant = require("./routes/VariantionRoute");
 
 // route
 app.use("/api/admin", adminUser);
+app.use("/api/variant", variant);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {
