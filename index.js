@@ -17,11 +17,13 @@ global.__basedir = __dirname;
 const adminUser = require("./routes/UserAdminRoute");
 const variant = require("./routes/VariantionRoute");
 const category = require("./routes/CategoryRoute");
+const size = require("./routes/SizeRoute");
 
 // route
 app.use("/api/admin", adminUser);
 app.use("/api/variant", variant);
 app.use("/api/category", category);
+app.use("/api/size", size);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {
