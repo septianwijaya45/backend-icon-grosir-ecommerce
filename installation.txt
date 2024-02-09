@@ -1,4 +1,4 @@
-npm i express express-async-handler cors jsonwebtoken bcrypt nodemon dotenv sequelize sequelize-cli multer
+npm i express express-async-handler cors jsonwebtoken bcrypt nodemon dotenv sequelize sequelize-cli multer uuid
 
 // create user 
 npx sequelize-cli model:generate --name User --attributes name:string,email:string,password:string
