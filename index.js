@@ -14,12 +14,16 @@ global.__basedir = __dirname;
 
 // *** ROUTES *** //
 // deklarasi route
+const authUser = require("./routes/AuthRoute");
 const adminUser = require("./routes/UserAdminRoute");
 const variant = require("./routes/VariantionRoute");
 const category = require("./routes/CategoryRoute");
 const size = require("./routes/SizeRoute");
 
-// route
+// authentication
+app.use("/api/auth", authUser);
+
+// master
 app.use("/api/admin", adminUser);
 app.use("/api/variant", variant);
 app.use("/api/category", category);
