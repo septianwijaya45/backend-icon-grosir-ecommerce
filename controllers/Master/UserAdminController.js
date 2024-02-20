@@ -81,7 +81,16 @@ const createAdminUser = asyncHandler(async (req, res) => {
 const getAdminUserById = asyncHandler(async (req, res) => {
   try {
     const { uuid } = req.params;
-    let dataAdminUser = await Users.findOne({ uuid: uuid });
+    let dataAdminUser = await Users.findOne({
+      where: { uuid: uuid }, // Sertakan uuid dalam options.where
+      include: [
+        {
+          model: M_Admins,
+          as: "M_Admins",
+          required: true,
+        },
+      ],
+    });
 
     if (!dataAdminUser) {
       res.status(500).json({
@@ -141,7 +150,7 @@ const updateAdminUser = asyncHandler(async (req, res) => {
         return user.update(userData);
       })
       .then((updatedUser) => {
-        return M_Admins.findOne({ where: { userId: updatedUser.id } });
+        return M_Admins.findOne({ where: { user_id: updatedUser.id } });
       })
       .then((admin) => {
         if (admin) {
