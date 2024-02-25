@@ -3,31 +3,32 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class M_Variation_Products extends Model {
+  class M_Variant_Product_Detail extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      M_Variation_Products.belongsTo(models.M_Variations, {
+      M_Variant_Product_Detail.belongsTo(models.M_Variations, {
         foreignKey: "variation_id",
-        as: "variation",
+        as: "variation_detail",
       });
 
       // Define association with M_Products
-      M_Variation_Products.belongsTo(models.M_Products, {
+      M_Variant_Product_Detail.belongsTo(models.M_Products, {
         foreignKey: "product_id",
-        as: "product",
+        as: "product_variation_detail",
       });
     }
   }
-  M_Variation_Products.init({
+  M_Variant_Product_Detail.init({
     variation_id: DataTypes.INTEGER,
-    product_id: DataTypes.INTEGER
+    product_id: DataTypes.INTEGER,
+    variasi_detail: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'M_Variation_Products',
+    modelName: 'M_Variant_Product_Detail',
   });
-  return M_Variation_Products;
+  return M_Variant_Product_Detail;
 };

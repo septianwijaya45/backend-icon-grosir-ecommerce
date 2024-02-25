@@ -19,6 +19,7 @@ const adminUser = require("./routes/UserAdminRoute");
 const variant = require("./routes/VariantionRoute");
 const category = require("./routes/CategoryRoute");
 const size = require("./routes/SizeRoute");
+const product = require("./routes/ProductRoute");
 
 // authentication
 app.use("/api/auth", authUser);
@@ -28,6 +29,7 @@ app.use("/api/admin", adminUser);
 app.use("/api/variant", variant);
 app.use("/api/category", category);
 app.use("/api/size", size);
+app.use("/api/product", product);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {

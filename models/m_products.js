@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       M_Products.hasMany(models.M_Photo_Products, {
         foreignKey: "product_id",
-        as: "M_Photo_Products",
+        as: "photos",
       });
       M_Products.hasOne(models.M_Discount_Products, {
         foreignKey: "product_id",
@@ -54,7 +54,10 @@ module.exports = (sequelize, DataTypes) => {
       artikel: DataTypes.STRING,
       deskripsi: DataTypes.TEXT,
       harga: DataTypes.INTEGER,
+      minimum_pemesanan: DataTypes.INTEGER,
+      satuan_berat: DataTypes.STRING,
       diskon_tipe: DataTypes.STRING,
+      status_barang: DataTypes.INTEGER
     },
     {
       sequelize,

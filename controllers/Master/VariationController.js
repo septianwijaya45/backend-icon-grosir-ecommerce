@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { M_Variations } = require("../../models/");
+const { M_Variations, M_Variant_Product_Detail } = require("../../models/");
 
 const getAllVariation = asyncHandler(async (req, res) => {
   try {
@@ -125,10 +125,35 @@ const deleteVariation = asyncHandler(async (req, res) => {
   }
 });
 
+const getVariationDetails = asyncHandler(async (req, res) => {
+  try {
+    const { variation_id, product_id } = req.params;
+    console.log("params: " + variation_id);
+
+    let variationDetails = await M_Variant_Product_Detail.findAll({
+      where: {
+        variation_id: variation_id,
+        product_id: product_id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Get Data Success!",
+      data: variationDetails,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+    });
+  }
+});
+
 module.exports = {
   getAllVariation,
   createVariation,
   getVariationById,
   updateVariation,
   deleteVariation,
+  getVariationDetails,
 };

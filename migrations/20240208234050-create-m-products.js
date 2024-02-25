@@ -30,8 +30,20 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      minimum_pemesanan: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      satuan_berat: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       diskon_tipe: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      status_barang: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       createdAt: {
@@ -40,6 +52,10 @@ module.exports = {
       },
       updatedAt: {
         allowNull: false,
+        type: Sequelize.DATE,
+      },
+      deletedAt: {
+        allowNull: true,
         type: Sequelize.DATE,
       },
     });
