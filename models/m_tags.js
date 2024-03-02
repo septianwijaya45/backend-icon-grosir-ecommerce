@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "M_Tags",
+      paranoid: true,
     }
   );
   return M_Tags;

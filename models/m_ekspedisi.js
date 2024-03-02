@@ -13,11 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  M_Ekspedisi.init({
-    ekspedisi: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'M_Ekspedisi',
-  });
+  M_Ekspedisi.init(
+    {
+      ekspedisi: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "M_Ekspedisi",
+      paranoid: true,
+    }
+  );
   return M_Ekspedisi;
 };

@@ -22,12 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  M_Variation_Products.init({
-    variation_id: DataTypes.INTEGER,
-    product_id: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'M_Variation_Products',
-  });
+  M_Variation_Products.init(
+    {
+      variation_id: DataTypes.INTEGER,
+      product_id: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "M_Variation_Products",
+      paranoid: true,
+    }
+  );
   return M_Variation_Products;
 };

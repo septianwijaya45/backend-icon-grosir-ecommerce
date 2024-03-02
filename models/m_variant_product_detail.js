@@ -22,13 +22,17 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  M_Variant_Product_Detail.init({
-    variation_id: DataTypes.INTEGER,
-    product_id: DataTypes.INTEGER,
-    variasi_detail: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'M_Variant_Product_Detail',
-  });
+  M_Variant_Product_Detail.init(
+    {
+      variation_id: DataTypes.INTEGER,
+      product_id: DataTypes.INTEGER,
+      variasi_detail: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "M_Variant_Product_Detail",
+      paranoid: true,
+    }
+  );
   return M_Variant_Product_Detail;
 };

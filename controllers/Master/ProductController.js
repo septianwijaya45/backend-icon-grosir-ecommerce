@@ -10,6 +10,7 @@ const {
   T_Stocks,
 } = require("../../models/");
 const { v4: uuidv4 } = require("uuid");
+const { default: axios } = require("axios");
 
 const getAllProduct = asyncHandler(async (req, res) => {
   try {
@@ -187,6 +188,7 @@ const getProductById = asyncHandler(async (req, res) => {
             where: {
               deletedAt: null, // Tambahkan kondisi deletedAt harus null
             },
+            required: false,
           },
         },
         {
@@ -198,6 +200,7 @@ const getProductById = asyncHandler(async (req, res) => {
             where: {
               deletedAt: null, // Tambahkan kondisi deletedAt harus null
             },
+            required: false,
           },
         },
         {
@@ -206,9 +209,14 @@ const getProductById = asyncHandler(async (req, res) => {
           where: {
             deletedAt: null, // Tambahkan kondisi deletedAt harus null
           },
+          required: false,
         },
       ],
     });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
 
     const stock = await T_Stocks.findOne({
       where: {
@@ -216,9 +224,6 @@ const getProductById = asyncHandler(async (req, res) => {
       },
     });
 
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
 
     res.status(200).json({
       message: "Get Data Success!",
@@ -305,7 +310,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       },
     });
 
-    if (varian.length != 0) {
+    if (varian != null) {
       for (let i = 0; i < varian.length; i++) {
         M_Variation_Products.create({
           variation_id: varian[i],
@@ -350,7 +355,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       }
     }
 
-    if (size.length != 0) {
+    if (size != null) {
       for (let i = 0; i < size.length; i++) {
         M_Size_Products.create({
           size_id: size[i],
@@ -404,13 +409,70 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
+    const { uuid } = req.params;
+
+    const product = await M_Products.findOne({ where: { uuid: uuid } });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const deleteProduct = await M_Products.destroy({
+      where: {
+        uuid: uuid,
+      },
+    });
+
     res.status(200).json({
-      message: "Get Data Success!",
-      data: category,
+      message: "Delete Data Success!",
+      status: true,
     });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
+      status: false,
+      message: "Internal Server Error! Please Contact Developer",
+    });
+  }
+});
+
+const syncProduct = asyncHandler(async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://backoffice.icongrosir.com/api/get-stok"
+    );
+
+    const syncDataProduct = response.data.data;
+
+    syncDataProduct.forEach(async (product) => {
+      const getProduct = await M_Products.findOne({
+        where: { artikel: product.artikel },
+      });
+
+      if (!getProduct) {
+        const createProduct = await M_Products.create({
+          uuid: uuidv4(),
+          category_id: 4,
+          nama_barang: product.nama_barang,
+          artikel: product.artikel,
+          harga: product.harga,
+        });
+
+        const stockCreate = await T_Stocks.create({
+          product_id: createProduct.id,
+          stock: product.total_stok,
+        });
+      }
+    });
+
+    res.status(200).json({
+      message: "Sync Data Success!",
+      status: true,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -422,4 +484,5 @@ module.exports = {
   getProductById,
   updateProduct,
   deleteProduct,
+  syncProduct,
 };

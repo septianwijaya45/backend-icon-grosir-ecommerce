@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "T_Transaksi_Details",
+      paranoid: true,
     }
   );
   return T_Transaksi_Details;

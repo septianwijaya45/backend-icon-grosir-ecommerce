@@ -13,12 +13,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  M_Size_Products.init({
-    size_id: DataTypes.INTEGER,
-    product_id: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'M_Size_Products',
-  });
+  M_Size_Products.init(
+    {
+      size_id: DataTypes.INTEGER,
+      product_id: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "M_Size_Products",
+      paranoid: true,
+    }
+  );
   return M_Size_Products;
 };
