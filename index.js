@@ -20,6 +20,8 @@ const variant = require("./routes/VariantionRoute");
 const category = require("./routes/CategoryRoute");
 const size = require("./routes/SizeRoute");
 const product = require("./routes/ProductRoute");
+const expedition = require("./routes/ExpeditionRoute");
+const discountCategory = require("./routes/DiscountCategoryRoute");
 
 // authentication
 app.use("/api/auth", authUser);
@@ -30,6 +32,8 @@ app.use("/api/variant", variant);
 app.use("/api/category", category);
 app.use("/api/size", size);
 app.use("/api/product", product);
+app.use("/api/expedition", expedition);
+app.use("/api/discount-categories", discountCategory);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {
