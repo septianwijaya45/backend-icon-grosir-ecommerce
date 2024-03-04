@@ -4,7 +4,7 @@ const {
   getSizeById,
   updateSize,
   deleteSize,
-} = require("../controllers/Master/SizesController");
+} = require("../../controllers/Master/SizesController");
 
 const router = require("express").Router();
 

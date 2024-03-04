@@ -14,15 +14,16 @@ global.__basedir = __dirname;
 
 // *** ROUTES *** //
 // deklarasi route
-const authUser = require("./routes/AuthRoute");
-const adminUser = require("./routes/UserAdminRoute");
-const variant = require("./routes/VariantionRoute");
-const category = require("./routes/CategoryRoute");
-const size = require("./routes/SizeRoute");
-const product = require("./routes/ProductRoute");
-const expedition = require("./routes/ExpeditionRoute");
-const discountCategory = require("./routes/DiscountCategoryRoute");
-const discountProduct = require("./routes/DiscountProductRoute");
+const authUser = require("./routes/backend/AuthRoute");
+const adminUser = require("./routes/backend/UserAdminRoute");
+const variant = require("./routes/backend/VariantionRoute");
+const category = require("./routes/backend/CategoryRoute");
+const size = require("./routes/backend/SizeRoute");
+const product = require("./routes/backend/ProductRoute");
+const expedition = require("./routes/backend/ExpeditionRoute");
+const discountCategory = require("./routes/backend/DiscountCategoryRoute");
+const discountProduct = require("./routes/backend/DiscountProductRoute");
+const customerAccount = require("./routes/backend/CustomerUserRoute");
 
 // authentication
 app.use("/api/auth", authUser);
@@ -36,6 +37,7 @@ app.use("/api/product", product);
 app.use("/api/expedition", expedition);
 app.use("/api/discount-categories", discountCategory);
 app.use("/api/discount-products", discountProduct);
+app.use("/api/customer-account", customerAccount);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {

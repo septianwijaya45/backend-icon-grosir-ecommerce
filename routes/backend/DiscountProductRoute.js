@@ -1,5 +1,10 @@
-const { getAllDiscountProduct, createDiscountProduct, getDiscountProductById, updateDiscountProduct, deleteDiscountProduct } = require("../controllers/Master/DiscountProductsController");
-
+const {
+  getAllDiscountProduct,
+  createDiscountProduct,
+  getDiscountProductById,
+  updateDiscountProduct,
+  deleteDiscountProduct,
+} = require("../../controllers/Master/DiscountProductsController");
 
 const router = require("express").Router();
 

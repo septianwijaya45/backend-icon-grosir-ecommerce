@@ -4,7 +4,7 @@ const {
   getAdminUserById,
   updateAdminUser,
   deleteAdminUser,
-} = require("../controllers/Master/UserAdminController");
+} = require("../../controllers/Master/UserAdminController");
 
 const router = require("express").Router();
 

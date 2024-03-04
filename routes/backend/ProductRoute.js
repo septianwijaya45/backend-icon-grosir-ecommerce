@@ -5,7 +5,7 @@ const {
   updateProduct,
   deleteProduct,
   syncProduct,
-} = require("../controllers/Master/ProductController");
+} = require("../../controllers/Master/ProductController");
 
 const router = require("express").Router();
 

@@ -1,5 +1,10 @@
-const { getAllDiscountCategory, createDiscountCategory, getDiscountCategoryById, updateDiscountCategory, deleteDiscountCategory } = require("../controllers/Master/DiscountCategoriesController");
-
+const {
+  getAllDiscountCategory,
+  createDiscountCategory,
+  getDiscountCategoryById,
+  updateDiscountCategory,
+  deleteDiscountCategory,
+} = require("../../controllers/Master/DiscountCategoriesController");
 
 const router = require("express").Router();
 

@@ -1,5 +1,10 @@
-const { getAllExpedition, createExpedition, getExpeditionById, updateExpedition, deleteExpedition } = require("../controllers/Master/ExpeditionController");
-
+const {
+  getAllExpedition,
+  createExpedition,
+  getExpeditionById,
+  updateExpedition,
+  deleteExpedition,
+} = require("../../controllers/Master/ExpeditionController");
 
 const router = require("express").Router();
 

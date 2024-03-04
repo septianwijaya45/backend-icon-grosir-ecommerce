@@ -5,7 +5,7 @@ const {
   updateVariation,
   deleteVariation,
   getVariationDetails,
-} = require("../controllers/Master/VariationController");
+} = require("../../controllers/Master/VariationController");
 
 const router = require("express").Router();
 
