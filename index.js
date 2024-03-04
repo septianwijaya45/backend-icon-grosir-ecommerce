@@ -22,6 +22,7 @@ const size = require("./routes/SizeRoute");
 const product = require("./routes/ProductRoute");
 const expedition = require("./routes/ExpeditionRoute");
 const discountCategory = require("./routes/DiscountCategoryRoute");
+const discountProduct = require("./routes/DiscountProductRoute");
 
 // authentication
 app.use("/api/auth", authUser);
@@ -34,6 +35,7 @@ app.use("/api/size", size);
 app.use("/api/product", product);
 app.use("/api/expedition", expedition);
 app.use("/api/discount-categories", discountCategory);
+app.use("/api/discount-products", discountProduct);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {
