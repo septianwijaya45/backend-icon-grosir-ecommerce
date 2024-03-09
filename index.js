@@ -24,6 +24,7 @@ const expedition = require("./routes/backend/ExpeditionRoute");
 const discountCategory = require("./routes/backend/DiscountCategoryRoute");
 const discountProduct = require("./routes/backend/DiscountProductRoute");
 const customerAccount = require("./routes/backend/CustomerUserRoute");
+const rateReviews = require("./routes/backend/RateReviewRoute");
 
 // authentication
 app.use("/api/auth", authUser);
@@ -38,6 +39,7 @@ app.use("/api/expedition", expedition);
 app.use("/api/discount-categories", discountCategory);
 app.use("/api/discount-products", discountProduct);
 app.use("/api/customer-account", customerAccount);
+app.use("/api/rate-review", rateReviews);
 // *** ROUTES *** //
 
 app.listen(PORT, () => {

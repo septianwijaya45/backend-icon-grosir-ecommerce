@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "product_id",
         as: "M_Products",
       });
+
+      T_Rate_And_Reviews.belongsTo(models.User_Ecommerces, {
+        foreignKey: "user_ecommerce_id",
+        as: "User_Ecommerces",
+      });
     }
   }
   T_Rate_And_Reviews.init(
@@ -21,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       foto_review: DataTypes.STRING,
       rating: DataTypes.FLOAT,
       review_deskripsi: DataTypes.TEXT,
+      isShow: DataTypes.INTEGER,
     },
     {
       sequelize,
