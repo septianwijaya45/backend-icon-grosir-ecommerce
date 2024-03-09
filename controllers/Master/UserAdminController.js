@@ -82,7 +82,7 @@ const getAdminUserById = asyncHandler(async (req, res) => {
   try {
     const { uuid } = req.params;
     let dataAdminUser = await Users.findOne({
-      where: { uuid: uuid }, // Sertakan uuid dalam options.where
+      where: { uuid: uuid }, 
       include: [
         {
           model: M_Admins,

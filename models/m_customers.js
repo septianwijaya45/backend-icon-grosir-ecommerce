@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       kota: DataTypes.STRING,
       kode_pos: DataTypes.STRING,
       foto_profil: DataTypes.TEXT,
+      jenis_kelamin: DataTypes.STRING,
     },
     {
       sequelize,

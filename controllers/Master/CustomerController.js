@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Users, M_Customers } = require("../../models/");
+const { Users, M_Customers, User_Ecommerces } = require("../../models/");
 const { v4: uuidv4 } = require("uuid");
 
 const getAllCustomer = asyncHandler(async (req, res) => {
@@ -38,23 +38,26 @@ const createCustomer = asyncHandler(async (req, res) => {
             no_telepon,
             alamat,
             kota,
+            jenis_kelamin,
             kode_pos
         } = req.body
 
         const emailExists = await User_Ecommerces.findOne({ where: { email : email } });
 
         if (emailExists) {
-          res.status(404);
-          throw new Error("User Already Exists");
+          res.status(500).json({
+            status: false,
+            message: "Email Sudah Terdaftar",
+          });
         }
 
         const account = {
           uuid: uuidv4(),
           role_id: 3,
+          name: first_name+' '+ (last_name ? last_name : ''),
           username: username,
           email: email,
-          password: password,
-          picture: !picture ? "default.png" : picture,
+          password: password
         };
 
         const user = await User_Ecommerces.create(account);
@@ -67,6 +70,8 @@ const createCustomer = asyncHandler(async (req, res) => {
           alamat: alamat,
           kota: kota,
           kode_pos: kode_pos,
+          jenis_kelamin: jenis_kelamin,
+          foto_profil: !picture ? "default.png" : picture,
         };
 
         const customer = await M_Customers.create(customerData)
@@ -100,7 +105,7 @@ const getCustomerById = asyncHandler(async (req, res) => {
           ],
         });
 
-        if (!dataAdminUser) {
+        if (!customerDetail) {
           res.status(500).json({
             message: "Data Tidak Ditemukan!",
           });
@@ -119,6 +124,7 @@ const getCustomerById = asyncHandler(async (req, res) => {
 
 const updateCustomer = asyncHandler( async (req, res) => {
     try {
+        const { uuid } = req.params;
         const {
           username,
           email,
@@ -193,7 +199,9 @@ const deleteCustomer = asyncHandler(async (req, res) => {
       });
     }
 
-    const customer = await M_Customers.findOne({ where: { user_id: user.id } });
+    const customer = await M_Customers.findOne({
+      where: { user_ecommerce_id: user.id },
+    });
     if (customer) {
       await customer.destroy();
     }
