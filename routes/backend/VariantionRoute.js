@@ -6,8 +6,11 @@ const {
   deleteVariation,
   getVariationDetails,
 } = require("../../controllers/Master/VariationController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllVariation);
 router.route("/create-data").post(createVariation);

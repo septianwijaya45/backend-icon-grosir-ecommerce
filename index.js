@@ -1,4 +1,6 @@
 const express = require("express");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const path = require("path");
 const cors = require("cors");
@@ -6,6 +8,15 @@ const cors = require("cors");
 const app = express();
 dotenv.config();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SECRET_ACCESS_KEY,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 app.use(cors());
 
 const PORT = process.env.PORT || 3030;

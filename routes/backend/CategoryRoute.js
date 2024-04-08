@@ -5,8 +5,11 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../../controllers/Master/CategoriesController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllCategory);
 router.route("/create-data").post(createCategory);

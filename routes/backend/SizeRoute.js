@@ -5,8 +5,11 @@ const {
   updateSize,
   deleteSize,
 } = require("../../controllers/Master/SizesController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllSize);
 router.route("/create-data").post(createSize);

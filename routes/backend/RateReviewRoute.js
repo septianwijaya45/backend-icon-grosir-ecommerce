@@ -5,8 +5,11 @@ const {
   updateRateReview,
   deleteRateReview,
 } = require("../../controllers/Transaction/Rate&ReviewController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllRateReviews);
 router.route("/create-data").post(createRateReviews);

@@ -6,8 +6,11 @@ const {
   deleteProduct,
   syncProduct,
 } = require("../../controllers/Master/ProductController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllProduct);
 router.route("/sync-data").get(syncProduct);

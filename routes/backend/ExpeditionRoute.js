@@ -5,8 +5,11 @@ const {
   updateExpedition,
   deleteExpedition,
 } = require("../../controllers/Master/ExpeditionController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllExpedition);
 router.route("/create-data").post(createExpedition);

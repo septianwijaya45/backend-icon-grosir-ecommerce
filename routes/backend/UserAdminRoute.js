@@ -5,8 +5,11 @@ const {
   updateAdminUser,
   deleteAdminUser,
 } = require("../../controllers/Master/UserAdminController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllAdminUser);
 router.route("/create-data").post(createAdminUser);

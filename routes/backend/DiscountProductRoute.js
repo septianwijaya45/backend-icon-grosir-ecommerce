@@ -5,8 +5,11 @@ const {
   updateDiscountProduct,
   deleteDiscountProduct,
 } = require("../../controllers/Master/DiscountProductsController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllDiscountProduct);
 router.route("/create-data").post(createDiscountProduct);

@@ -5,8 +5,11 @@ const {
   updateDiscountCategory,
   deleteDiscountCategory,
 } = require("../../controllers/Master/DiscountCategoriesController");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
+
+router.use(authenticateToken);
 
 router.route("/get-data").get(getAllDiscountCategory);
 router.route("/create-data").post(createDiscountCategory);
