@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "product_id",
         as: "product_variation_detail",
       });
+
+       M_Variant_Product_Detail.belongsTo(models.T_Stocks, {
+         foreignKey: "product_id",
+         as: "t_stok_details",
+       });
     }
   }
   M_Variant_Product_Detail.init(
@@ -27,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       variation_id: DataTypes.INTEGER,
       product_id: DataTypes.INTEGER,
       variasi_detail: DataTypes.STRING,
+      warna: DataTypes.STRING,
+      ukuran: DataTypes.STRING,
+      lain_lain: DataTypes.STRING,
+      harga: DataTypes.INTEGER,
     },
     {
       sequelize,

@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
+const { Op } = require('sequelize')
 const {
+  sequelize,
   M_Products,
   M_Variations,
   M_Variation_Products,
@@ -38,19 +40,25 @@ const createProduct = asyncHandler(async (req, res) => {
       artikel,
       category_id,
       deskripsi,
-      harga,
       minimal_pembelian,
-      satuan_berat,
-      diskon_tipe,
       status_barang,
       varian,
-      size,
-      stock,
+      warna,
+      ukuran,
+      lain_lain,
+      harga,
+      stok,
       foto_1,
       foto_2,
       foto_3,
       foto_4,
       foto_5,
+      foto_6,
+      foto_7,
+      foto_8,
+      foto_9,
+      foto_10,
+      video,
     } = req.body;
 
     const dataProduct = {
@@ -59,69 +67,64 @@ const createProduct = asyncHandler(async (req, res) => {
       nama_barang: nama_barang,
       artikel: artikel,
       deskripsi: deskripsi,
-      harga: harga,
       minimum_pemesanan: minimal_pembelian,
-      satuan_berat: satuan_berat,
       diskon_tipe: null,
       status_barang: status_barang,
     };
 
     const product = await M_Products.create(dataProduct);
 
-    const stockCreate = await T_Stocks.create({
-      product_id: product.id,
-      stock: stock,
-    });
-
     if (varian.length != 0) {
       for (let i = 0; i < varian.length; i++) {
-        M_Variation_Products.create({
-          variation_id: varian[i],
+        let getVarian
+        if(varian[i] == 'standard'){
+          getVarian = await M_Variations.findOne({
+            where: {
+              variasi: {
+                [Op.like]: "%standard%",
+              },
+            },
+          });
+        }else{
+          getVarian = await M_Variations.findOne({
+            where: { id: varian[i] },
+          });
+        }
+
+        await M_Variation_Products.create({
+          variation_id: getVarian.id,
           product_id: product.id,
         });
 
-        if (req.body[`varian${i}_detail1`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail1`],
-          });
-        }
-        if (req.body[`varian${i}_detail2`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail2`],
-          });
-        }
-        if (req.body[`varian${i}_detail3`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail3`],
-          });
-        }
-        if (req.body[`varian${i}_detail4`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail4`],
-          });
-        }
-        if (req.body[`varian${i}_detail5`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail5`],
-          });
-        }
+        await M_Variant_Product_Detail.create({
+          variation_id: getVarian.id,
+          product_id: product.id,
+          variasi_detail: getVarian.variasi,
+          warna: warna[i],
+          ukuran: ukuran[i],
+          lain_lain: lain_lain[i],
+          harga: harga[i],
+        });
+
+        await T_Stocks.create({
+          variation_id: getVarian.id,
+          product_id: product.id,
+          warna: warna[i],
+          ukuran: ukuran[i],
+          lain_lain: lain_lain[i],
+          stock: stok[i],
+        });
       }
     }
 
-    if (size.length != 0) {
-      for (let i = 0; i < size.length; i++) {
-        M_Size_Products.create({
-          size_id: size[i],
+    if (ukuran.length != 0) {
+      for (let i = 0; i < ukuran.length; i++) {
+        let idSize = await M_Sizes.findOne({
+          where: { size: ukuran[i] },
+        });
+
+        await M_Size_Products.create({
+          size_id: idSize.id,
           product_id: product.id,
         });
       }
@@ -155,6 +158,42 @@ const createProduct = asyncHandler(async (req, res) => {
       M_Photo_Products.create({
         product_id: product.id,
         nama_file: foto_5,
+      });
+    }
+    if (foto_6 && foto_6 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_6,
+      });
+    }
+    if (foto_7 && foto_7 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_7,
+      });
+    }
+    if (foto_8 && foto_8 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_8,
+      });
+    }
+    if (foto_9 && foto_9 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_9,
+      });
+    }
+    if (foto_10 && foto_10 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_10,
+      });
+    }
+    if (video && video != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: video,
       });
     }
 
@@ -184,11 +223,19 @@ const getProductById = asyncHandler(async (req, res) => {
           through: {
             model: M_Variation_Products,
             as: "variation",
-            attributes: [], // Exclude additional attributes from the pivot table
+            attributes: [],
             where: {
-              deletedAt: null, // Tambahkan kondisi deletedAt harus null
+              deletedAt: null,
             },
             required: false,
+            through: {
+              model: M_Variant_Product_Detail,
+              as: "product_variation_detail",
+              where: {
+                deletedAt: null,
+              },
+              required: false,
+            },
           },
         },
         {
@@ -218,17 +265,32 @@ const getProductById = asyncHandler(async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
+    const variations = await M_Variant_Product_Detail.findAll({
+      where: { product_id: product.id },
+      include: [
+        {
+          model: T_Stocks,
+          as: "t_stok_details",
+          required: false,
+          on: sequelize.literal(
+            "`M_Variant_Product_Detail`.`product_id` = `t_stok_details`.`product_id` AND `M_Variant_Product_Detail`.`variation_id` = `t_stok_details`.`variation_id` AND `t_stok_details`.`deletedAt` IS NULL AND (`M_Variant_Product_Detail`.`warna` = `t_stok_details`.`warna` OR (`M_Variant_Product_Detail`.`warna` IS NULL AND `t_stok_details`.`warna` IS NULL)) AND (`M_Variant_Product_Detail`.`ukuran` = `t_stok_details`.`ukuran` OR (`M_Variant_Product_Detail`.`ukuran` IS NULL AND `t_stok_details`.`ukuran` IS NULL)) AND (`M_Variant_Product_Detail`.`lain_lain` = `t_stok_details`.`lain_lain` OR (`M_Variant_Product_Detail`.`lain_lain` IS NULL AND `t_stok_details`.`lain_lain` IS NULL))"
+          ),
+        },
+      ],
+    });
+
+
     const stock = await T_Stocks.findOne({
       where: {
         product_id: product.id,
       },
     });
 
-
     res.status(200).json({
       message: "Get Data Success!",
       data: product,
       stock: stock,
+      variations: variations,
     });
   } catch (error) {
     console.error(error.message);
@@ -246,19 +308,29 @@ const updateProduct = asyncHandler(async (req, res) => {
       artikel,
       category_id,
       deskripsi,
-      harga,
       minimal_pembelian,
-      satuan_berat,
-      diskon_tipe,
       status_barang,
       varian,
-      size,
-      stock,
+      variant_id,
+      warna,
+      ukuran,
+      lain_lain,
+      warnaBefore,
+      ukuranBefore,
+      lain_lainBefore,
+      harga,
+      stok,
       foto_1,
       foto_2,
       foto_3,
       foto_4,
       foto_5,
+      foto_6,
+      foto_7,
+      foto_8,
+      foto_9,
+      foto_10,
+      video,
     } = req.body;
 
     const dataProduct = {
@@ -266,9 +338,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       nama_barang: nama_barang,
       artikel: artikel,
       deskripsi: deskripsi,
-      harga: harga,
       minimum_pemesanan: minimal_pembelian,
-      satuan_berat: satuan_berat,
       diskon_tipe: null,
       status_barang: status_barang,
     };
@@ -281,86 +351,138 @@ const updateProduct = asyncHandler(async (req, res) => {
       },
     });
 
-    const stockCreate = await T_Stocks.update(
-      {
-        stock: stock,
-      },
-      {
-        where: {
-          product_id: product.id,
-        },
-      }
-    );
-
-    const deleteVariationProduct = await M_Variation_Products.destroy({
-      where: {
-        product_id: product.id,
-      },
-    });
-
-    const deleteVarianDetail = await M_Variant_Product_Detail.destroy({
-      where: {
-        product_id: product.id,
-      },
-    });
-
-    const deleteSize = await M_Size_Products.destroy({
-      where: {
-        product_id: product.id,
-      },
-    });
-
-    if (varian != null) {
+    if (varian.length != 0) {
       for (let i = 0; i < varian.length; i++) {
-        M_Variation_Products.create({
-          variation_id: varian[i],
-          product_id: product.id,
-        });
+        let getVarian;
+        if (varian[i] == "standard") {
+          getVarian = await M_Variations.findOne({
+            where: {
+              variasi: {
+                [Op.like]: "%standard%",
+              },
+            },
+          });
+        } else {
+          getVarian = await M_Variations.findOne({
+            where: { id: varian[i] },
+          });
+        }
 
-        if (req.body[`varian${i}_detail1`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail1`],
+        if (
+          variant_id[i] !== null &&
+          typeof variant_id[i] !== "undefined"
+        ) {
+          // variant product
+          await M_Variation_Products.findOne({
+            where: {
+              variation_id: variant_id[i],
+              product_id: product.id,
+            },
+          }).then((variantProduct) => {
+            return variantProduct.update({
+              variation_id: varian[i],
+            });
           });
-        }
-        if (req.body[`varian${i}_detail2`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail2`],
+
+          // variant product detail
+          await M_Variant_Product_Detail.findOne({
+            where: {
+              variation_id: variant_id[i],
+              product_id: product.id,
+              warna: warnaBefore[i],
+              ukuran: ukuranBefore[i],
+              lain_lain: lain_lainBefore[i],
+            },
+          }).then((variantProductDetail) => {
+            return variantProductDetail.update({
+              variation_id: getVarian.id,
+              product_id: product.id,
+              variasi_detail: getVarian.variasi,
+              warna: warna[i],
+              ukuran: ukuran[i],
+              lain_lain: lain_lain[i],
+              harga: harga[i],
+            });
           });
-        }
-        if (req.body[`varian${i}_detail3`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
-            product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail3`],
+
+          // Stok
+          await T_Stocks.findOne({
+            where: {
+              variation_id: variant_id[i],
+              product_id: product.id,
+              warna: warnaBefore[i],
+              ukuran: ukuranBefore[i],
+              lain_lain: lain_lainBefore[i],
+            },
+          }).then((stok) => {
+            return stok.update({
+              variation_id: getVarian.id,
+              product_id: product.id,
+              warna: warna[i],
+              ukuran: ukuran[i],
+              lain_lain: lain_lain[i],
+              stock: stok[i],
+            });
           });
-        }
-        if (req.body[`varian${i}_detail4`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
+        } else {
+          console.log('masuk sana')
+          await M_Variation_Products.create({
+            variation_id: getVarian.id,
             product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail4`],
           });
-        }
-        if (req.body[`varian${i}_detail5`]) {
-          M_Variant_Product_Detail.create({
-            variation_id: varian[i],
+
+          await M_Variant_Product_Detail.create({
+            variation_id: getVarian.id,
             product_id: product.id,
-            variasi_detail: req.body[`varian${i}_detail5`],
+            variasi_detail: getVarian.variasi,
+            warna: warna[i],
+            ukuran: ukuran[i],
+            lain_lain: lain_lain[i],
+            harga: harga[i],
+          });
+
+          await T_Stocks.create({
+            variation_id: getVarian.id,
+            product_id: product.id,
+            warna: warna[i],
+            ukuran: ukuran[i],
+            lain_lain: lain_lain[i],
+            stock: stok[i],
           });
         }
       }
     }
 
-    if (size != null) {
-      for (let i = 0; i < size.length; i++) {
-        M_Size_Products.create({
-          size_id: size[i],
+    if (ukuran.length != 0) {
+      for (let i = 0; i < ukuran.length; i++) {
+        let idSize = await M_Sizes.findOne({
+          where: { size: ukuran[i] },
+        });
+        let idSizeBefore = await M_Sizes.findOne({
+          where: { size: ukuranBefore[i] },
+        });
+
+        let checkSize = M_Size_Products.findOne({
+          size_id: idSize.id,
           product_id: product.id,
         });
+
+        if (!checkSize) {
+          await M_Size_Products.create({
+            size_id: idSize.id,
+            product_id: product.id,
+          });
+        } else {
+          await M_Size_Products.findOne({
+            size_id: idSizeBefore.id,
+            product_id: product.id,
+          }).then((sizeProduct) => {
+            return sizeProduct.update({
+              size_id: idSize.id,
+              product_id: product.id,
+            });
+          });
+        }
       }
     }
 
@@ -392,6 +514,42 @@ const updateProduct = asyncHandler(async (req, res) => {
       M_Photo_Products.create({
         product_id: product.id,
         nama_file: foto_5,
+      });
+    }
+    if (foto_6 && foto_6 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_6,
+      });
+    }
+    if (foto_7 && foto_7 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_7,
+      });
+    }
+    if (foto_8 && foto_8 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_8,
+      });
+    }
+    if (foto_9 && foto_9 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_9,
+      });
+    }
+    if (foto_10 && foto_10 != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: foto_10,
+      });
+    }
+    if (video && video != null) {
+      M_Photo_Products.create({
+        product_id: product.id,
+        nama_file: video,
       });
     }
 
@@ -439,18 +597,18 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const syncProduct = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      "https://backoffice.icongrosir.com/api/get-stok"
+      process.env.URL_API_POS_DEV + "get-barang"
     );
 
     const syncDataProduct = response.data.data;
 
-    syncDataProduct.forEach(async (product) => {
-      const getProduct = await M_Products.findOne({
+    for (const product of syncDataProduct) {
+      const existingProduct = await M_Products.findOne({
         where: { artikel: product.artikel },
       });
 
-      if (!getProduct) {
-        const createProduct = await M_Products.create({
+      if (!existingProduct) {
+        const createdProduct = await M_Products.create({
           uuid: uuidv4(),
           category_id: 4,
           nama_barang: product.nama_barang,
@@ -458,12 +616,57 @@ const syncProduct = asyncHandler(async (req, res) => {
           harga: product.harga,
         });
 
-        const stockCreate = await T_Stocks.create({
-          product_id: createProduct.id,
-          stock: product.total_stok,
-        });
+        for (const variant of product.varian_barang) {
+          let existingVariant = await M_Variations.findOne({
+            where: { variasi: variant.nama_varian },
+          });
+
+          if (!existingVariant) {
+            existingVariant = await M_Variations.create({
+              variasi: variant.nama_varian,
+            });
+          }
+
+          const existingVariantProduct = await M_Variation_Products.findOne({
+            where: {
+              variation_id: existingVariant.id,
+              product_id: createdProduct.id,
+            },
+          });
+
+          if (!existingVariantProduct) {
+            await M_Variation_Products.create({
+              variation_id: existingVariant.id,
+              product_id: createdProduct.id,
+            });
+          }
+
+          for (const harga of product.harga_barang) {
+            await M_Variant_Product_Detail.create({
+              variation_id: existingVariant.id,
+              product_id: createdProduct.id,
+              variasi_detail: variant.nama_varian,
+              warna: harga.warna,
+              ukuran: harga.ukuran,
+              lain_lain: harga.lain_lain,
+              harga: harga.harga,
+            });
+          }
+
+          for (const stok of product.stok_barang) {
+            await T_Stocks.create({
+              variation_id: existingVariant.id,
+              product_id: createdProduct.id,
+              variasi_detail: variant.nama_varian,
+              warna: stok.warna,
+              ukuran: stok.ukuran,
+              lain_lain: stok.lain_lain,
+              stock: stok.stok,
+            });
+          }
+        }
       }
-    });
+    }
 
     res.status(200).json({
       message: "Sync Data Success!",

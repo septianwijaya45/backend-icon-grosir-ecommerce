@@ -32,7 +32,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const accessToken = jwt.sign({ username: user.username }, "accesssecret", {
-      expiresIn: "15m",
+      expiresIn: "15h",
     });
     const refreshToken = jwt.sign(
       { username: user.username },

@@ -16,7 +16,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   T_Stocks.init(
     {
+      variation_id: DataTypes.INTEGER,
       product_id: DataTypes.INTEGER,
+      stock: DataTypes.INTEGER,
+      warna: DataTypes.STRING,
+      ukuran: DataTypes.STRING,
+      lain_lain: DataTypes.STRING,
       stock: DataTypes.INTEGER,
     },
     {
