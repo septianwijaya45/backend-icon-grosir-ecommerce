@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { M_Customers, User_Ecommerces } = require("../../models/");
+const { M_Customers, User_Ecommerces } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 
 const getAllCustomer = asyncHandler(async (req, res) => {

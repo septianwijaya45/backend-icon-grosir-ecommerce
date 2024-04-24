@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { M_Variations, M_Variant_Product_Detail } = require("../../models/");
+const { M_Variations, M_Variant_Product_Detail } = require("../../../models/");
 
 const getAllVariation = asyncHandler(async (req, res) => {
   try {

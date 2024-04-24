@@ -4,7 +4,7 @@ const {
   getSizeById,
   updateSize,
   deleteSize,
-} = require("../../controllers/Master/SizesController");
+} = require("../../controllers/Backoffice/Master/SizesController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

@@ -4,7 +4,7 @@ const {
   updateCustomer,
   getCustomerById,
   deleteCustomer,
-} = require("../../controllers/Master/CustomerController");
+} = require("../../controllers/Backoffice/Master/CustomerController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

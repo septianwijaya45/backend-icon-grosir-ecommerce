@@ -1,13 +1,13 @@
 const asyncHandler = require("express-async-handler");
-const { M_Sizes } = require("../../models/");
+const { M_Categories } = require("../../../models/");
 
-const getAllSize = asyncHandler(async (req, res) => {
+const getAllCategory = asyncHandler(async (req, res) => {
   try {
-    const sizes = await M_Sizes.findAll();
+    const category = await M_Categories.findAll();
 
     res.status(200).json({
       message: "Get Data Success!",
-      data: sizes,
+      data: category,
     });
   } catch (error) {
     console.error(error.message);
@@ -17,12 +17,12 @@ const getAllSize = asyncHandler(async (req, res) => {
   }
 });
 
-const createSize = asyncHandler(async (req, res) => {
+const createCategory = asyncHandler(async (req, res) => {
   try {
-    const { size } = req.body;
+    const { category } = req.body;
 
-    const newData = await M_Sizes.create({
-      size: size,
+    const newData = await M_Categories.create({
+      category: category,
     });
 
     res.status(200).json({
@@ -37,19 +37,19 @@ const createSize = asyncHandler(async (req, res) => {
   }
 });
 
-const getSizeById = asyncHandler(async (req, res) => {
+const getCategoryById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const size = await M_Sizes.findOne({ where: { id: id } });
+    const category = await M_Categories.findOne({ where: { id: id } });
 
-    if (!size) {
+    if (!category) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
     res.status(200).json({
-      data: size,
+      data: category,
     });
   } catch (error) {
     console.error(error.message);
@@ -59,22 +59,22 @@ const getSizeById = asyncHandler(async (req, res) => {
   }
 });
 
-const updateSize = asyncHandler(async (req, res) => {
+const updateCategory = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { size } = req.body;
+    const { category } = req.body;
 
-    const checkSize = await M_Sizes.findOne({ where: { id: id } });
+    const checkCategory = await M_Categories.findOne({ where: { id: id } });
 
-    if (!checkSize) {
+    if (!checkCategory) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Sizes.update(
+    await M_Categories.update(
       {
-        size: size,
+        category: category,
       },
       {
         where: {
@@ -83,10 +83,10 @@ const updateSize = asyncHandler(async (req, res) => {
       }
     );
 
-    let newData = await M_Sizes.findOne({ where: { id: id } });
+    let newData = await M_Categories.findOne({ where: { id: id } });
 
     res.status(200).json({
-      message: `Update Data ${checkSize.size} Success!`,
+      message: `Update Data ${checkCategory.category} Success!`,
       data: newData,
     });
   } catch (error) {
@@ -97,25 +97,25 @@ const updateSize = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteSize = asyncHandler(async (req, res) => {
+const deleteCategory = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const checkSize = await M_Sizes.findOne({ where: { id: id } });
+    const checkCategory = await M_Categories.findOne({ where: { id: id } });
 
-    if (!checkSize) {
+    if (!checkCategory) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Sizes.destroy({
+    await M_Categories.destroy({
       where: {
         id: id,
       },
     });
 
     res.status(200).json({
-      message: `Delete Data ${checkSize.size} Success!`,
+      message: `Delete Data ${checkCategory.category} Success!`,
     });
   } catch (error) {
     console.error(error.message);
@@ -126,9 +126,9 @@ const deleteSize = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAllSize,
-  createSize,
-  getSizeById,
-  updateSize,
-  deleteSize,
+  getAllCategory,
+  createCategory,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
 };

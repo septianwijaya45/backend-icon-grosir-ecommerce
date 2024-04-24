@@ -1,13 +1,13 @@
 const asyncHandler = require("express-async-handler");
-const { M_Ekspedisi } = require("../../models/");
+const { M_Sizes } = require("../../../models/");
 
-const getAllExpedition = asyncHandler(async (req, res) => {
+const getAllSize = asyncHandler(async (req, res) => {
   try {
-    const expeditions = await M_Ekspedisi.findAll();
+    const sizes = await M_Sizes.findAll();
 
     res.status(200).json({
       message: "Get Data Success!",
-      data: expeditions,
+      data: sizes,
     });
   } catch (error) {
     console.error(error.message);
@@ -17,12 +17,12 @@ const getAllExpedition = asyncHandler(async (req, res) => {
   }
 });
 
-const createExpedition = asyncHandler(async (req, res) => {
+const createSize = asyncHandler(async (req, res) => {
   try {
-    const { expedition } = req.body;
+    const { size } = req.body;
 
-    const newData = await M_Ekspedisi.create({
-      ekspedisi: expedition,
+    const newData = await M_Sizes.create({
+      size: size,
     });
 
     res.status(200).json({
@@ -37,19 +37,19 @@ const createExpedition = asyncHandler(async (req, res) => {
   }
 });
 
-const getExpeditionById = asyncHandler(async (req, res) => {
+const getSizeById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const expedition = await M_Ekspedisi.findOne({ where: { id: id } });
+    const size = await M_Sizes.findOne({ where: { id: id } });
 
-    if (!expedition) {
+    if (!size) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
     res.status(200).json({
-      data: expedition,
+      data: size,
     });
   } catch (error) {
     console.error(error.message);
@@ -59,22 +59,22 @@ const getExpeditionById = asyncHandler(async (req, res) => {
   }
 });
 
-const updateExpedition = asyncHandler(async (req, res) => {
+const updateSize = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { expedition } = req.body;
+    const { size } = req.body;
 
-    const checkExpedition = await M_Ekspedisi.findOne({ where: { id: id } });
+    const checkSize = await M_Sizes.findOne({ where: { id: id } });
 
-    if (!checkExpedition) {
+    if (!checkSize) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Ekspedisi.update(
+    await M_Sizes.update(
       {
-        ekspedisi: expedition,
+        size: size,
       },
       {
         where: {
@@ -83,10 +83,10 @@ const updateExpedition = asyncHandler(async (req, res) => {
       }
     );
 
-    let newData = await M_Ekspedisi.findOne({ where: { id: id } });
+    let newData = await M_Sizes.findOne({ where: { id: id } });
 
     res.status(200).json({
-      message: `Update Data ${checkExpedition.ekspedisi} Success!`,
+      message: `Update Data ${checkSize.size} Success!`,
       data: newData,
     });
   } catch (error) {
@@ -97,25 +97,25 @@ const updateExpedition = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteExpedition = asyncHandler(async (req, res) => {
+const deleteSize = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const checkExpedition = await M_Ekspedisi.findOne({ where: { id: id } });
+    const checkSize = await M_Sizes.findOne({ where: { id: id } });
 
-    if (!checkExpedition) {
+    if (!checkSize) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Ekspedisi.destroy({
+    await M_Sizes.destroy({
       where: {
         id: id,
       },
     });
 
     res.status(200).json({
-      message: `Delete Data ${checkExpedition.ekspedisi} Success!`,
+      message: `Delete Data ${checkSize.size} Success!`,
     });
   } catch (error) {
     console.error(error.message);
@@ -126,9 +126,9 @@ const deleteExpedition = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAllExpedition,
-  createExpedition,
-  getExpeditionById,
-  updateExpedition,
-  deleteExpedition,
+  getAllSize,
+  createSize,
+  getSizeById,
+  updateSize,
+  deleteSize,
 };

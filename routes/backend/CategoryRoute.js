@@ -4,7 +4,7 @@ const {
   getCategoryById,
   updateCategory,
   deleteCategory,
-} = require("../../controllers/Master/CategoriesController");
+} = require("../../controllers/Backoffice/Master/CategoriesController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

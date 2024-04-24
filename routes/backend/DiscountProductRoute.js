@@ -4,7 +4,7 @@ const {
   getDiscountProductById,
   updateDiscountProduct,
   deleteDiscountProduct,
-} = require("../../controllers/Master/DiscountProductsController");
+} = require("../../controllers/Backoffice/Master/DiscountProductsController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

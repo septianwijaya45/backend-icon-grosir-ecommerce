@@ -4,7 +4,7 @@ const {
   getRateReviewById,
   updateRateReview,
   deleteRateReview,
-} = require("../../controllers/Transaction/Rate&ReviewController");
+} = require("../../controllers/Backoffice/Transaction/Rate&ReviewController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

@@ -1,14 +1,14 @@
 const asyncHandler = require("express-async-handler");
-const { M_Discount_Categories, M_Categories } = require("../../models/");
+const { M_Discount_Products, M_Products } = require("../../../models");
 
-const getAllDiscountCategory = asyncHandler(async (req, res) => {
+const getAllDiscountProduct = asyncHandler(async (req, res) => {
   try {
-    const discountCategory = await M_Discount_Categories.findAll({
+    const discountProduct = await M_Discount_Products.findAll({
       include: [
         {
-          model: M_Categories,
-          as: "M_Categories",
-          attributes: ['category'],
+          model: M_Products,
+          as: "M_Products",
+          attributes: ['nama_barang'],
           where: {
             deletedAt: null,
           },
@@ -18,7 +18,7 @@ const getAllDiscountCategory = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       message: "Get Data Success!",
-      data: discountCategory,
+      data: discountProduct,
     });
   } catch (error) {
     console.error(error.message);
@@ -28,13 +28,13 @@ const getAllDiscountCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const createDiscountCategory = asyncHandler(async (req, res) => {
+const createDiscountProduct = asyncHandler(async (req, res) => {
   try {
-    const { category_id, diskon_persen, diskon_harga, start_date, end_date } =
+    const { product_id, diskon_persen, diskon_harga, start_date, end_date } =
       req.body;
 
-    const newData = await M_Discount_Categories.create({
-      category_id: category_id,
+    const newData = await M_Discount_Products.create({
+      product_id: product_id,
       diskon_persen: diskon_persen,
       diskon_harga: diskon_harga,
       start_date: start_date,
@@ -53,21 +53,21 @@ const createDiscountCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const getDiscountCategoryById = asyncHandler(async (req, res) => {
+const getDiscountProductById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const discountCategory = await M_Discount_Categories.findOne({
+    const discountProduct = await M_Discount_Products.findOne({
       where: { id: id },
     });
 
-    if (!discountCategory) {
+    if (!discountProduct) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
     res.status(200).json({
-      data: discountCategory,
+      data: discountProduct,
     });
   } catch (error) {
     console.error(error.message);
@@ -77,25 +77,25 @@ const getDiscountCategoryById = asyncHandler(async (req, res) => {
   }
 });
 
-const updateDiscountCategory = asyncHandler(async (req, res) => {
+const updateDiscountProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_id, diskon_persen, diskon_harga, start_date, end_date } =
+    const { product_id, diskon_persen, diskon_harga, start_date, end_date } =
       req.body;
 
-    const checkDiscountCategory = await M_Discount_Categories.findOne({
+    const checkDiscountProduct = await M_Discount_Products.findOne({
       where: { id: id },
     });
 
-    if (!checkDiscountCategory) {
+    if (!checkDiscountProduct) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Discount_Categories.update(
+    await M_Discount_Products.update(
       {
-        category_id: category_id,
+        product_id: product_id,
         diskon_persen: diskon_persen,
         diskon_harga: diskon_harga,
         start_date: start_date,
@@ -108,10 +108,10 @@ const updateDiscountCategory = asyncHandler(async (req, res) => {
       }
     );
 
-    let newData = await M_Discount_Categories.findOne({ where: { id: id } });
+    let newData = await M_Discount_Products.findOne({ where: { id: id } });
 
     res.status(200).json({
-      message: `Update Data ${checkDiscountCategory.category} Success!`,
+      message: `Update Data ${checkDiscountProduct.category} Success!`,
       data: newData,
     });
   } catch (error) {
@@ -122,27 +122,27 @@ const updateDiscountCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteDiscountCategory = asyncHandler(async (req, res) => {
+const deleteDiscountProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const checkDiscountCategory = await M_Discount_Categories.findOne({
+    const checkDiscountProduct = await M_Discount_Products.findOne({
       where: { id: id },
     });
 
-    if (!checkDiscountCategory) {
+    if (!checkDiscountProduct) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Discount_Categories.destroy({
+    await M_Discount_Products.destroy({
       where: {
         id: id,
       },
     });
 
     res.status(200).json({
-      message: `Delete Data ${checkDiscountCategory.category} Success!`,
+      message: `Delete Data ${checkDiscountProduct.category} Success!`,
     });
   } catch (error) {
     console.error(error.message);
@@ -153,9 +153,9 @@ const deleteDiscountCategory = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAllDiscountCategory,
-  createDiscountCategory,
-  getDiscountCategoryById,
-  updateDiscountCategory,
-  deleteDiscountCategory,
+  getAllDiscountProduct,
+  createDiscountProduct,
+  getDiscountProductById,
+  updateDiscountProduct,
+  deleteDiscountProduct,
 };

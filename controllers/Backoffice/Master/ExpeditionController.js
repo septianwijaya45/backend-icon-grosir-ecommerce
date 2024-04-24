@@ -1,13 +1,13 @@
 const asyncHandler = require("express-async-handler");
-const { M_Categories } = require("../../models/");
+const { M_Ekspedisi } = require("../../../models/");
 
-const getAllCategory = asyncHandler(async (req, res) => {
+const getAllExpedition = asyncHandler(async (req, res) => {
   try {
-    const category = await M_Categories.findAll();
+    const expeditions = await M_Ekspedisi.findAll();
 
     res.status(200).json({
       message: "Get Data Success!",
-      data: category,
+      data: expeditions,
     });
   } catch (error) {
     console.error(error.message);
@@ -17,12 +17,12 @@ const getAllCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const createCategory = asyncHandler(async (req, res) => {
+const createExpedition = asyncHandler(async (req, res) => {
   try {
-    const { category } = req.body;
+    const { expedition } = req.body;
 
-    const newData = await M_Categories.create({
-      category: category,
+    const newData = await M_Ekspedisi.create({
+      ekspedisi: expedition,
     });
 
     res.status(200).json({
@@ -37,19 +37,19 @@ const createCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const getCategoryById = asyncHandler(async (req, res) => {
+const getExpeditionById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await M_Categories.findOne({ where: { id: id } });
+    const expedition = await M_Ekspedisi.findOne({ where: { id: id } });
 
-    if (!category) {
+    if (!expedition) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
     res.status(200).json({
-      data: category,
+      data: expedition,
     });
   } catch (error) {
     console.error(error.message);
@@ -59,22 +59,22 @@ const getCategoryById = asyncHandler(async (req, res) => {
   }
 });
 
-const updateCategory = asyncHandler(async (req, res) => {
+const updateExpedition = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { category } = req.body;
+    const { expedition } = req.body;
 
-    const checkCategory = await M_Categories.findOne({ where: { id: id } });
+    const checkExpedition = await M_Ekspedisi.findOne({ where: { id: id } });
 
-    if (!checkCategory) {
+    if (!checkExpedition) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Categories.update(
+    await M_Ekspedisi.update(
       {
-        category: category,
+        ekspedisi: expedition,
       },
       {
         where: {
@@ -83,10 +83,10 @@ const updateCategory = asyncHandler(async (req, res) => {
       }
     );
 
-    let newData = await M_Categories.findOne({ where: { id: id } });
+    let newData = await M_Ekspedisi.findOne({ where: { id: id } });
 
     res.status(200).json({
-      message: `Update Data ${checkCategory.category} Success!`,
+      message: `Update Data ${checkExpedition.ekspedisi} Success!`,
       data: newData,
     });
   } catch (error) {
@@ -97,25 +97,25 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteCategory = asyncHandler(async (req, res) => {
+const deleteExpedition = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const checkCategory = await M_Categories.findOne({ where: { id: id } });
+    const checkExpedition = await M_Ekspedisi.findOne({ where: { id: id } });
 
-    if (!checkCategory) {
+    if (!checkExpedition) {
       res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    await M_Categories.destroy({
+    await M_Ekspedisi.destroy({
       where: {
         id: id,
       },
     });
 
     res.status(200).json({
-      message: `Delete Data ${checkCategory.category} Success!`,
+      message: `Delete Data ${checkExpedition.ekspedisi} Success!`,
     });
   } catch (error) {
     console.error(error.message);
@@ -126,9 +126,9 @@ const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAllCategory,
-  createCategory,
-  getCategoryById,
-  updateCategory,
-  deleteCategory,
+  getAllExpedition,
+  createExpedition,
+  getExpeditionById,
+  updateExpedition,
+  deleteExpedition,
 };

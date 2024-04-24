@@ -5,7 +5,7 @@ const {
   updateProduct,
   deleteProduct,
   syncProduct,
-} = require("../../controllers/Master/ProductController");
+} = require("../../controllers/Backoffice/Master/ProductController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

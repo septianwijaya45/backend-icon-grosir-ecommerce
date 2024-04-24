@@ -10,7 +10,7 @@ const {
   M_Sizes,
   M_Size_Products,
   T_Stocks,
-} = require("../../models/");
+} = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 const { default: axios } = require("axios");
 

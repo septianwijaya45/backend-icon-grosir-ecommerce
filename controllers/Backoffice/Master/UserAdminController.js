@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Users, M_Admins } = require("../../models/");
+const { Users, M_Admins } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 
 const getAllAdminUser = asyncHandler(async (req, res) => {

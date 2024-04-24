@@ -4,7 +4,7 @@ const {
   getAdminUserById,
   updateAdminUser,
   deleteAdminUser,
-} = require("../../controllers/Master/UserAdminController");
+} = require("../../controllers/Backoffice/Master/UserAdminController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

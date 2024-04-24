@@ -3,7 +3,7 @@ const {
   T_Rate_And_Reviews,
   M_Products,
   User_Ecommerces,
-} = require("../../models/");
+} = require("../../../models/");
 
 const getAllRateReviews = asyncHandler(async (req, res) => {
   try {

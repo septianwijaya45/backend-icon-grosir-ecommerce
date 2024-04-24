@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       T_Transaksi_Details.belongsTo(models.M_Products, {
         foreignKey: "product_id",
-        as: "M_Products",
+        as: "productsTransaction",
       });
     }
   }
@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       transaksi_id: DataTypes.INTEGER,
       product_id: DataTypes.INTEGER,
+      variation_id: DataTypes.INTEGER,
+      warna: DataTypes.STRING,
+      ukuran: DataTypes.STRING,
+      lain_lain: DataTypes.STRING,
       qty: DataTypes.INTEGER,
       total_harga: DataTypes.FLOAT,
     },

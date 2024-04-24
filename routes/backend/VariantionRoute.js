@@ -5,7 +5,7 @@ const {
   updateVariation,
   deleteVariation,
   getVariationDetails,
-} = require("../../controllers/Master/VariationController");
+} = require("../../controllers/Backoffice/Master/VariationController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();

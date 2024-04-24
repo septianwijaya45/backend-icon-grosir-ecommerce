@@ -25,6 +25,7 @@ global.__basedir = __dirname;
 
 // *** ROUTES *** //
 // deklarasi route
+// Backoffice
 const authUser = require("./routes/backend/AuthRoute");
 const adminUser = require("./routes/backend/UserAdminRoute");
 const variant = require("./routes/backend/VariantionRoute");
@@ -37,10 +38,14 @@ const discountProduct = require("./routes/backend/DiscountProductRoute");
 const customerAccount = require("./routes/backend/CustomerUserRoute");
 const rateReviews = require("./routes/backend/RateReviewRoute");
 
+// Ecomomerce
+const categoryHome = require('./routes/frontend/Home/CategoryRoute');
+const productHome = require('./routes/frontend/Home/ProductRoute');
+
 // authentication
 app.use("/api/auth", authUser);
 
-// master
+// master backoffice
 app.use("/api/admin", adminUser);
 app.use("/api/variant", variant);
 app.use("/api/category", category);
@@ -51,6 +56,11 @@ app.use("/api/discount-categories", discountCategory);
 app.use("/api/discount-products", discountProduct);
 app.use("/api/customer-account", customerAccount);
 app.use("/api/rate-review", rateReviews);
+
+// **** ecommerce **** //
+app.use('/api/home/category', categoryHome);
+app.use("/api/home/product", productHome);
+
 // *** ROUTES *** //
 
 app.listen(PORT, () => {

@@ -4,7 +4,7 @@ const {
   getExpeditionById,
   updateExpedition,
   deleteExpedition,
-} = require("../../controllers/Master/ExpeditionController");
+} = require("../../controllers/Backoffice/Master/ExpeditionController");
 const { authenticateToken } = require("../../middleware/authMiddleware");
 
 const router = require("express").Router();
