@@ -597,7 +597,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const syncProduct = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      process.env.URL_API_POS_DEV + "get-barang"
+      process.env.URL_API_POS_DEV + "get-stok"
     );
 
     const syncDataProduct = response.data.data;
@@ -616,14 +616,15 @@ const syncProduct = asyncHandler(async (req, res) => {
           harga: product.harga,
         });
 
-        for (const variant of product.varian_barang) {
+        // for (const variant of product.variant_id) {
+
           let existingVariant = await M_Variations.findOne({
-            where: { variasi: variant.nama_varian },
+            where: { variasi: product.nama_varian },
           });
 
           if (!existingVariant) {
             existingVariant = await M_Variations.create({
-              variasi: variant.nama_varian,
+              variasi: product.nama_varian,
             });
           }
 
@@ -641,30 +642,30 @@ const syncProduct = asyncHandler(async (req, res) => {
             });
           }
 
-          for (const harga of product.harga_barang) {
+          // for (const harga of product.harga) {
             await M_Variant_Product_Detail.create({
               variation_id: existingVariant.id,
               product_id: createdProduct.id,
-              variasi_detail: variant.nama_varian,
-              warna: harga.warna,
-              ukuran: harga.ukuran,
-              lain_lain: harga.lain_lain,
-              harga: harga.harga,
+              variasi_detail: product.nama_varian,
+              warna: product.warna,
+              ukuran: product.ukuran,
+              lain_lain: product.lain_lain,
+              harga: product.harga,
             });
-          }
+          // }
 
-          for (const stok of product.stok_barang) {
+          // for (const stok of product.stok) {
             await T_Stocks.create({
               variation_id: existingVariant.id,
               product_id: createdProduct.id,
-              variasi_detail: variant.nama_varian,
-              warna: stok.warna,
-              ukuran: stok.ukuran,
-              lain_lain: stok.lain_lain,
-              stock: stok.stok,
+              variasi_detail: product.nama_varian,
+              warna: product.warna,
+              ukuran: product.ukuran,
+              lain_lain: product.lain_lain,
+              stock: product.stok,
             });
-          }
-        }
+          // }
+        // }
       }
     }
 
