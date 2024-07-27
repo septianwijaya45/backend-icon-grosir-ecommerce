@@ -12,6 +12,16 @@ module.exports = (sequelize, DataTypes) => {
         through: "M_Variation_Products",
         foreignKey: "variation_id",
       });
+
+      M_Variations.belongsToMany(models.M_Products, {
+        through: "M_Variation_Products",
+        foreignKey: "variation_id",
+      });
+
+      M_Variations.hasMany(models.M_Variant_Product_Detail, {
+        foreignKey: "variation_id",
+        as: "variation_product_detail",
+      });
     }
   }
   M_Variations.init(

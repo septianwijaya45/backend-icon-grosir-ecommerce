@@ -41,9 +41,17 @@ const rateReviews = require("./routes/backend/RateReviewRoute");
 // Ecomomerce
 const categoryHome = require('./routes/frontend/Home/CategoryRoute');
 const productHome = require('./routes/frontend/Home/ProductRoute');
+const authUserEcommerce = require("./routes/frontend/Authentication/AuthRoute");
+const wishlistTransaction = require("./routes/frontend/Transaction/WishlistRoute")
+const cardTransaction = require("./routes/frontend/Transaction/CartRoute");
+const checkoutTransaction = require("./routes/frontend/Transaction/CheckoutRoute");
+
+// User Route
+const accountDetail = require('./routes/frontend/Authentication/UserRoute')
 
 // authentication
 app.use("/api/auth", authUser);
+app.use("/api/auth-ecommerce", authUserEcommerce);
 
 // master backoffice
 app.use("/api/admin", adminUser);
@@ -60,6 +68,10 @@ app.use("/api/rate-review", rateReviews);
 // **** ecommerce **** //
 app.use('/api/home/category', categoryHome);
 app.use("/api/home/product", productHome);
+app.use("/api/transaction/wishlist", wishlistTransaction);
+app.use("/api/transaction/cart", cardTransaction);
+app.use("/api/transaction/checkout", checkoutTransaction);
+app.use("/api/account-me", accountDetail);
 
 // *** ROUTES *** //
 

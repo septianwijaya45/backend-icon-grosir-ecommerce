@@ -256,7 +256,7 @@ const getProductById = asyncHandler(async (req, res) => {
         },
       ],
     });
-
+    
     const productSize = await M_Variant_Product_Detail.findAll({
       attributes: ["ukuran"],
       where: { product_id: product.id },
@@ -272,6 +272,7 @@ const getProductById = asyncHandler(async (req, res) => {
       ],
       group: ["ukuran"],
     });
+    
 
     const category = await M_Categories.findOne({
       where: {

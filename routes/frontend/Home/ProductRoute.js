@@ -1,6 +1,5 @@
 const { getProductByCategories, getProductByFeatured, getProductByLatest, getProductByPopular, getProductById } = require("../../../controllers/Frontoffice/Product/ProductController");
 
-
 const router = require("express").Router();
 
 router.route("/get-eight-product-by-categories/:categoryId").get(getProductByCategories);
