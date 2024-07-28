@@ -6,6 +6,24 @@ const {
   Sequelize,
 } = require("../../../models");
 
+const getAllCategory = asyncHandler(async (req, res) => {
+  try {
+    const category = await M_Categories.findAll({
+      where: {deletedAt: null}
+    });
+
+    res.status(200).json({
+      message: "Get Data Success!",
+      data: category,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+    });
+  }
+});
+
 const getFiveCategory = asyncHandler(async (req, res) => {
   try {
     const categories = await M_Categories.findAll({
@@ -72,4 +90,5 @@ const getTreeCategory = asyncHandler(async (req, res) => {
 module.exports = {
   getFiveCategory,
   getTreeCategory,
+  getAllCategory
 };

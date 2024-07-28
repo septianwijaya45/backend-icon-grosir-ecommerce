@@ -1,7 +1,8 @@
-const { getProductByCategories, getProductByFeatured, getProductByLatest, getProductByPopular, getProductById } = require("../../../controllers/Frontoffice/Product/ProductController");
+const { getProductByCategories, getProductByFeatured, getProductByLatest, getProductByPopular, getProductById, getAllProduct } = require("../../../controllers/Frontoffice/Product/ProductController");
 
 const router = require("express").Router();
 
+router.route('/get-all-product').get(getAllProduct)
 router.route("/get-eight-product-by-categories/:categoryId").get(getProductByCategories);
 router.route("/get-product-popular").get(getProductByPopular);
 router.route("/get-product-featured").get(getProductByFeatured);

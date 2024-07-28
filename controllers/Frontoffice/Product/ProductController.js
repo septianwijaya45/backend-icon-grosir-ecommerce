@@ -15,67 +15,69 @@ const {
   User_Ecommerces,
 } = require("../../../models/");
 
-const getProductByCategories = asyncHandler(async (req, res) => {
+const getAllProduct = asyncHandler(async (req, res) => {
   try {
-    const { categoryId } = req.params;
-    const category = await M_Categories.findOne({
-        where: {
-            category: categoryId
-        }
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 8; // Default to 8 items per page if not provided
+    const offset = (page - 1) * limit;
+
+    const products = await M_Products.findAndCountAll({
+      include: [
+        {
+          model: M_Variations,
+          through: {
+            model: M_Variation_Products,
+            as: "variation",
+            attributes: [],
+            where: {
+              deletedAt: null,
+            },
+            required: false,
+            through: {
+              model: M_Variant_Product_Detail,
+              as: "product_variation_detail",
+              where: {
+                deletedAt: null,
+              },
+              required: false,
+            },
+          },
+        },
+        {
+          model: M_Sizes,
+          through: {
+            model: M_Size_Products,
+            as: "size",
+            attributes: [],
+            where: {
+              deletedAt: null,
+            },
+            required: false,
+          },
+        },
+        {
+          model: M_Photo_Products,
+          as: "photos",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
+      ],
+      limit: limit,
+      offset: offset,
     });
 
-     const products = await M_Products.findAll({
-       where: {
-         category_id: category.id,
-       },
-       include: [
-         {
-           model: M_Variations,
-           through: {
-             model: M_Variation_Products,
-             as: "variation",
-             attributes: [],
-             where: {
-               deletedAt: null,
-             },
-             required: false,
-             through: {
-               model: M_Variant_Product_Detail,
-               as: "product_variation_detail",
-               where: {
-                 deletedAt: null,
-               },
-               required: false,
-             },
-           },
-         },
-         {
-           model: M_Sizes,
-           through: {
-             model: M_Size_Products,
-             as: "size",
-             attributes: [],
-             where: {
-               deletedAt: null,
-             },
-             required: false,
-           },
-         },
-         {
-           model: M_Photo_Products,
-           as: "photos",
-           where: {
-             deletedAt: null,
-           },
-           required: false,
-         },
-       ],
-       limit: 8,
-     });
+    const totalPages = Math.ceil(products.count / limit);
 
     res.status(200).json({
-      message: "Get 8 Product Success!",
-      data: products,
+      message: "Get Products Success!",
+      data: products.rows,
+      pagination: {
+        totalItems: products.count,
+        totalPages: totalPages,
+        currentPage: page,
+      },
     });
   } catch (error) {
     console.error(error.message);
@@ -85,6 +87,76 @@ const getProductByCategories = asyncHandler(async (req, res) => {
   }
 });
 
+
+const getProductByCategories = asyncHandler(async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const category = await M_Categories.findOne({
+        where: {
+            category: categoryId
+        }
+    });
+
+      const products = await M_Products.findAll({
+        where: {
+          category_id: category.id,
+        },
+        include: [
+          {
+            model: M_Variations,
+            through: {
+              model: M_Variation_Products,
+              as: "variation",
+              attributes: [],
+              where: {
+                deletedAt: null,
+              },
+              required: false,
+              through: {
+                model: M_Variant_Product_Detail,
+                as: "product_variation_detail",
+                where: {
+                  deletedAt: null,
+                },
+                required: false,
+              },
+            },
+          },
+          {
+            model: M_Sizes,
+            through: {
+              model: M_Size_Products,
+              as: "size",
+              attributes: [],
+              where: {
+                deletedAt: null,
+              },
+              required: false,
+            },
+          },
+          {
+            model: M_Photo_Products,
+            as: "photos",
+            where: {
+              deletedAt: null,
+            },
+            required: false,
+          },
+        ],
+        limit: 8,
+      });
+
+      res.status(200).json({
+        message: "Get 8 Product Success!",
+        data: products,
+      });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+    });
+  }
+});
 
 const getProductByPopular= asyncHandler(async(req, res) => {
   try {
@@ -317,4 +389,5 @@ module.exports = {
   getProductByFeatured,
   getProductByLatest,
   getProductById,
+  getAllProduct
 };
