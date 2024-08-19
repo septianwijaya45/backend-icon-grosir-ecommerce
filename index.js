@@ -52,6 +52,10 @@ const checkoutTransaction = require("./routes/frontend/Transaction/CheckoutRoute
 // User Route
 const accountDetail = require('./routes/frontend/Authentication/UserRoute')
 
+app.get('/', async (req, res) => {
+  return res.send("API e-commerce IconGrosir")
+})
+
 // authentication
 app.use("/api/auth", authUser);
 app.use("/api/auth-ecommerce", authUserEcommerce);
