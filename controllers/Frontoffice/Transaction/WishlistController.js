@@ -5,6 +5,7 @@ const {
   M_Products,
   M_Variations,
   M_Variation_Products,
+  M_Variant_Product_Detail,
   User_Ecommerces,
   M_Photo_Products,
   M_Sizes,
@@ -74,11 +75,25 @@ const createWishlist = asyncHandler(async (req, res) => {
 
         const variant_id = product.M_Variations.length > 0 ? product.M_Variations[0].id : null;
 
+        const variantProductDetail = await M_Variant_Product_Detail.findOne({
+          where: {
+            variation_id: variant_id,
+            product_id: product.id
+          },
+          order: [['id', 'ASC']]
+        })
+        console.log('variantProductDetail');
+        console.log(variantProductDetail);
+        console.log(variantProductDetail.variasi_detail);
+        
+
         // Find or create wishlist for the user
         let wishlist = await T_Wishlists.findOne({
             where: { user_ecommerce_id:user.id },
             attributes: ['id'],
         });
+
+
 
         if (!wishlist) {
             wishlist = await T_Wishlists.create({
@@ -100,6 +115,9 @@ const createWishlist = asyncHandler(async (req, res) => {
                 variant_id: variant_id,
                 price: product.harga,
                 qty: 1,
+                varian: variantProductDetail ? variantProductDetail.variasi_detail : null,
+                warna: variantProductDetail ? variantProductDetail.warna : null,
+                ukuran: variantProductDetail ? variantProductDetail.ukuran : null,
             });
         }else{
           await T_Wishlist_Details.update(
@@ -132,7 +150,12 @@ const getWishlist = asyncHandler(async (req, res) => {
       SELECT 
           wd.id,
           wd.variant_id,
+          wd.varian,
+          wd.warna,
+          wd.ukuran,
+          wd.price,
           p.uuid,
+          p.image,
           p.nama_barang AS 'nama_barang',
           w.user_ecommerce_id,
           w.status,
@@ -179,6 +202,40 @@ const getWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+const updateQtyWishlist = asyncHandler(async (req, res) => {
+  try {
+    const { product_id, variant_id,  warna, ukuran, wishlish, qty} = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    await T_Wishlist_Details.update({
+      qty: qty
+    }, {
+      where: {
+        id: wishlish,
+        product_id: productDetail.id,
+        varian: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      }
+    })
+    
+    res.status(200).json({
+        message: "Update Wishlist Success!",
+        status: true,
+    });
+
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
 
 const deleteWishlist = asyncHandler(async (req, res) => {
   try {
@@ -228,5 +285,6 @@ const deleteWishlist = asyncHandler(async (req, res) => {
 module.exports = {
     createWishlist,
     getWishlist,
-    deleteWishlist
+    deleteWishlist,
+    updateQtyWishlist
 };

@@ -57,7 +57,9 @@ module.exports = (sequelize, DataTypes) => {
       minimum_pemesanan: DataTypes.INTEGER,
       satuan_berat: DataTypes.STRING,
       diskon_tipe: DataTypes.STRING,
-      status_barang: DataTypes.INTEGER
+      status_barang: DataTypes.INTEGER,
+      image: DataTypes.TEXT,
+      view_product: DataTypes.INTEGER,
     },
     {
       sequelize,

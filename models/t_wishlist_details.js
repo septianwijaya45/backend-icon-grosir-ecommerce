@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       variant_id: DataTypes.INTEGER,
       price: DataTypes.FLOAT,
       qty: DataTypes.INTEGER,
+      varian: DataTypes.STRING,
+      warna: DataTypes.STRING,
+      ukuran: DataTypes.STRING,
+      lain_lain: DataTypes.STRING,
     },
     {
       sequelize,

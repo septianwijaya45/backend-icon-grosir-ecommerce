@@ -597,7 +597,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const syncProduct = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      process.env.URL_API_POS_DEV + "get-stok"
+      process.env.URL_API_POS_DEV + "get-barang"
     );
 
     const syncDataProduct = response.data.data;
@@ -613,6 +613,7 @@ const syncProduct = asyncHandler(async (req, res) => {
           category_id: 4,
           nama_barang: product.nama_barang,
           artikel: product.artikel,
+          image: product.image,
           harga: product.harga,
         });
 
@@ -665,6 +666,47 @@ const syncProduct = asyncHandler(async (req, res) => {
               stock: product.stok,
             });
           // }
+
+            console.log('photos product:'+product.photos.length);
+            if(product.photos.length != 0){
+              for (const photo of product.photos) {
+                let photoProduct = await M_Photo_Products.findOne({
+                  where: {
+                    product_id: createdProduct.id,
+                    nama_file: photo.nama_file
+                  }
+                });
+                console.log('cek photoProduct');
+                console.log(photoProduct);
+                
+
+                if(!photoProduct){
+                  await M_Photo_Products.create({
+                    product_id: createdProduct.id,
+                    nama_file: photo.nama_file
+                  })
+                }
+              }
+            }
+
+            if(product.sizes.length != 0){
+              for (const sizeProduct of product.sizes) {
+                let size = await M_Sizes.findOne({ where: { size: sizeProduct.size } });
+                if(!size){
+                  size = await M_Sizes.create({
+                    size: sizeProduct.size,
+                  });
+                }
+                console.log('cek size');
+                console.log(size);
+                
+    
+                await M_Size_Products.create({
+                  product_id: createdProduct.id,
+                  size_id: size.id
+                })
+              }
+            }
         // }
       }
     }

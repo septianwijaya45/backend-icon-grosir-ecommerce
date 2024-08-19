@@ -13,24 +13,31 @@ const {
 } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 
-const countInvoice = async(req, res) => {
+const countInvoice = async (req, res) => {
     const countTransaction = await T_Transaksies.count({
         where: { deletedAt: null },
         attributes: ['id', 'kode_invoice']
-    })
+    });
 
-    const date = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    const hours = ('0' + date.getHours()).slice(-2);
-    const minutes = ('0' + date.getMinutes()).slice(-2);
-    const seconds = ('0' + date.getSeconds()).slice(-2);
-    
-    const invoiceNumber = `INV${year}${month}${day}${hours}${minutes}${seconds}-${countTransaction + 1}`;
-    
+    const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+
+    const randNumber = Math.floor(Math.random() * 90000) + 10000;;
+
+    const [
+        { value: month },,
+        { value: day },,
+        { value: year },,
+        { value: hour },,
+        { value: minute },,
+        { value: second }
+    ] = formatter.formatToParts(new Date());
+
+    const invoiceNumber = `INV${day}${month}${randNumber}${countTransaction + 1}`;
+
     return invoiceNumber;
-}
+};
+
 
 const getTransaksi = asyncHandler(async (req, res) => {
     try {
@@ -40,7 +47,8 @@ const getTransaksi = asyncHandler(async (req, res) => {
         let id = user.id
 
         const query = `
-            SELECT 
+            SELECT
+                t.kode_invoice, 
                 td.id,
                 td.variation_id,
                 p.uuid,
@@ -167,6 +175,19 @@ const createCheckout = asyncHandler(async(req, res) => {
             )
         }
 
+        await T_Cart_Details.destroy({
+            where: { 
+                cart_id: card.id, deletedAt: null
+            },
+        });
+        
+        await T_Carts.findOne({
+            where: {
+                id: card.id,
+                user_ecommerce_id: id,
+            }
+        });
+
         res.status(200).json({
             message: "Berhasil memasukkan ke checkout!",
             status: true
@@ -182,6 +203,7 @@ const createCheckout = asyncHandler(async(req, res) => {
 
 const processCheckout = asyncHandler(async(req, res) => {
     try {
+        const { ekspedisi_id } = req.body;
         const user = await User_Ecommerces.findOne({
             where: { no_telepon: req.user.username }
         });
@@ -193,7 +215,11 @@ const processCheckout = asyncHandler(async(req, res) => {
         })
 
         const transaction = await T_Transaksies.findOne({
-            where: {user_ecommerce_id: id}
+            where: {
+                user_ecommerce_id: id,
+                tanggal_checkout: null,
+                ekspedisi_id: null
+            }
         });
 
         const transactionDetails = await T_Transaksi_Details.findAll({
@@ -205,7 +231,12 @@ const processCheckout = asyncHandler(async(req, res) => {
         let no = 0;
         for (let detail of transactionDetails) {
             const product = await M_Products.findOne({ where: { id: detail.product_id } });
-            const variant = await M_Variant_Product_Detail.findOne({ where: { id: detail.variation_id } });
+            const variant = await M_Variant_Product_Detail.findOne({ 
+                where: { 
+                    variation_id: detail.variation_id, 
+                    product_id: detail.product_id
+                } 
+            });
 
             orderDetails += `${no += 1}. ${product.nama_barang} (${variant.variasi_detail}) - ${variant.warna} | ukuran: ${variant.ukuran} sebanyak Qty: ${detail.qty}\n`;
         }
@@ -221,8 +252,17 @@ const processCheckout = asyncHandler(async(req, res) => {
         });
 
         await T_Transaksies.update(
-            { tanggal_checkout: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }) },
-            { where: {user_ecommerce_id: id, tanggal_checkout: null}}
+            { 
+                tanggal_checkout: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+                ekspedisi_id: ekspedisi_id
+            },
+            { 
+                where: {
+                    user_ecommerce_id: id, 
+                    ekspedisi_id: null,
+                    tanggal_checkout: null
+                }
+            }
         );
 
         res.status(200).json({
