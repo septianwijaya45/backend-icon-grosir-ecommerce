@@ -39,6 +39,7 @@ const customerAccount = require("./routes/backend/CustomerUserRoute");
 const rateReviews = require("./routes/backend/RateReviewRoute");
 const transactionOrder = require("./routes/backend/TransactionRoute");
 const banner = require("./routes/backend/BannerRoute");
+const setting = require("./routes/backend/SettingRoute");
 
 // Ecomomerce
 const categoryHome = require('./routes/frontend/Home/CategoryRoute');
@@ -48,6 +49,7 @@ const authUserEcommerce = require("./routes/frontend/Authentication/AuthRoute");
 const wishlistTransaction = require("./routes/frontend/Transaction/WishlistRoute")
 const cardTransaction = require("./routes/frontend/Transaction/CartRoute");
 const checkoutTransaction = require("./routes/frontend/Transaction/CheckoutRoute");
+const historyTransaction = require("./routes/frontend/Transaction/HistoryOrderRoute");
 
 // User Route
 const accountDetail = require('./routes/frontend/Authentication/UserRoute')
@@ -73,6 +75,7 @@ app.use("/api/customer-account", customerAccount);
 app.use("/api/rate-review", rateReviews);
 app.use("/api/transaction", transactionOrder);
 app.use("/api/banner", banner);
+app.use("/api/setting", setting);
 
 // **** ecommerce **** //
 app.use('/api/home/category', categoryHome);
@@ -80,6 +83,7 @@ app.use("/api/home/product", productHome);
 app.use("/api/transaction/wishlist", wishlistTransaction);
 app.use("/api/transaction/cart", cardTransaction);
 app.use("/api/transaction/checkout", checkoutTransaction);
+app.use("/api/transaction/history", historyTransaction);
 app.use("/api/account-me", accountDetail);
 app.use("/api/home/banner-app", bannerFrontend);
 

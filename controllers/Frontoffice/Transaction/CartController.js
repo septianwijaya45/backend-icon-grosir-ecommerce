@@ -56,7 +56,9 @@ const getCart = asyncHandler(async (req, res) => {
             LEFT JOIN 
                 M_Variant_Product_Details as vpd ON v.id = vpd.variation_id AND vpd.deletedAt IS NULL AND p.id = vpd.product_id AND vpd.deletedAt IS NULL
             WHERE 
-                cd.deletedAt IS NULL AND c.user_ecommerce_id = :id
+                cd.deletedAt IS NULL 
+                
+                AND c.user_ecommerce_id = :id
             ORDER BY 
                 cd.id;
         `;

@@ -243,14 +243,6 @@ const processCheckout = asyncHandler(async(req, res) => {
 
         const message = `Hallo Permisi,\nSaya ${user.name} ingin memesan produk yang sudah saya checkout melalui aplikasi website icongrosir.com dengan detail ini:\n${orderDetails}\nMohon bisa diproses di alamat saya ya:\n${customer.alamat}\n\nTerima Kasih`;
 
-        const response = await fetch(process.env.URL_API_WA_WEB+'send-message', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ number: formattedNoTelepon, message: message })
-        });
-
         await T_Transaksies.update(
             { 
                 tanggal_checkout: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
@@ -268,6 +260,7 @@ const processCheckout = asyncHandler(async(req, res) => {
         res.status(200).json({
             message: "Anda berhasil checkout pesanan! Silahkan tunggu konfirmasi dari admin.",
             status: true,
+            sendMessage: message
         });
         
     } catch (error) {

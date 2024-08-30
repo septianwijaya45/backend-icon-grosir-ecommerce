@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const moment = require('moment');
+const { Op } = require('sequelize')
 
 const registerUser = asyncHandler(async (req, res) => {
     try {
@@ -35,6 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
             expired_date: moment().add(5, 'minutes').toDate() 
         });
     
+        /*
         const response = await fetch(process.env.URL_API_WA_WEB+'send-otp', {
             method: 'POST',
             headers: {
@@ -42,6 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
             },
             body: JSON.stringify({ number: formattedNoTelepon, otp: createOtp })
         });
+        */
         
         const result = await response.json();
         
@@ -58,6 +61,46 @@ const registerUser = asyncHandler(async (req, res) => {
         });
     }
 });
+
+const getConfirmOtp = asyncHandler(async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const user = await User_Ecommerces.findOne({
+      where: { uuid: user_id }
+    })
+
+    const otpData = await user_confirm_otp.findOne({
+        where: {
+            user_ecommerce_id: user.id,
+            kode_otp_confirm: null,
+            expired_date: {
+              [Op.gt]: new Date()
+            }
+        },
+        attributes: ['kode_otp', 'expired_date']
+    });
+
+    if (!otpData) {
+        return res.status(400).json({
+            status: false,
+            message: "OTP tidak ditemukan atau tidak valid!"
+        });
+    }
+
+    res.status(200).json({
+        status: true,
+        message: "Get Confirm OTP berhasil!",
+        otp: otpData,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "Internal Server Error! Please Contact Developer",
+    });
+  }
+})
 
 const confirmOtp = asyncHandler(async (req, res) => {
   try {
@@ -157,6 +200,7 @@ const resendOtp = asyncHandler(async (req, res) => {
         expired_date: moment().add(5, 'minutes').toDate() 
     });
 
+    /*
     const response = await fetch(process.env.URL_API_WA_WEB+'send-otp', {
         method: 'POST',
         headers: {
@@ -164,6 +208,7 @@ const resendOtp = asyncHandler(async (req, res) => {
         },
         body: JSON.stringify({ number: formattedNoTelepon, otp: createOtp })
     });
+    */
 
     res.status(200).json({
         status: true,
@@ -219,6 +264,7 @@ const loginUser = asyncHandler(async (req, res) => {
         expired_date: moment().add(5, 'minutes').toDate() 
     })
 
+    /*
     const response = await fetch(process.env.URL_API_WA_WEB+'send-otp', {
         method: 'POST',
         headers: {
@@ -226,6 +272,7 @@ const loginUser = asyncHandler(async (req, res) => {
         },
         body: JSON.stringify({ number: formattedNoTelepon, otp: createOtp })
     });
+    */
 
     res.status(200).json({
       status: true,
@@ -280,5 +327,6 @@ module.exports = {
   refreshToken,
   logout,
   confirmOtp,
-  resendOtp
+  resendOtp,
+  getConfirmOtp
 };

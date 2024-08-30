@@ -1,4 +1,4 @@
-const { registerUser, loginUser, logout, refreshToken, confirmOtp, resendOtp } = require("../../../controllers/Authentication/AuthFrontendController");
+const { registerUser, loginUser, logout, refreshToken, confirmOtp, resendOtp, getConfirmOtp } = require("../../../controllers/Authentication/AuthFrontendController");
 const {
   resetPassword,
 } = require("../../../controllers/Authentication/UserController");
@@ -12,5 +12,7 @@ router.route("/refresh-token").post(refreshToken);
 router.route("/register").post(registerUser);
 router.route("/confirm-otp").post(confirmOtp);
 router.route("/resend-otp").post(resendOtp);
+
+router.route("/get-confirm-otp").post(getConfirmOtp);
 
 module.exports = router;
