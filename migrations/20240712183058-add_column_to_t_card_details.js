@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.addColumn("t_cart_details", "variant_id", {
+      queryInterface.addColumn("T_Cart_Details", "variant_id", {
         type: Sequelize.DataTypes.INTEGER,
         after: 'product_id'
       }),
@@ -13,7 +13,7 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.removeColumn("t_cart_details", "variant_id"),
+      queryInterface.removeColumn("T_Cart_Details", "variant_id"),
     ]);
   }
 };
