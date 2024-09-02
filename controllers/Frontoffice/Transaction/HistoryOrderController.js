@@ -37,7 +37,7 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 vpd.ukuran AS 'ukuran',
                 vpd.lain_lain AS 'lain_lain',
                 vpd.harga AS 'harga',
-                ue.name,n
+                ue.name,
                 c.alamat
             FROM 
                 t_transaksies as t

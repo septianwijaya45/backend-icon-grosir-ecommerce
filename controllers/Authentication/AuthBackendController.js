@@ -57,6 +57,7 @@ const loginUser = asyncHandler(async (req, res) => {
     console.error(error); // Menampilkan kesalahan di konsol server
     res.status(500).json({
       success: false,
+      error: error,
       message: "Internal Server Error! Please Contact Developer",
     });
   }
