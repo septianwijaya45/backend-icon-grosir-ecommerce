@@ -12,6 +12,9 @@ module.exports = {
       product_id: {
         type: Sequelize.INTEGER,
       },
+      varian_product_detail_id: {
+        type: Sequelize.INTEGER,
+      },
       nama_file: {
         type: Sequelize.TEXT,
       },

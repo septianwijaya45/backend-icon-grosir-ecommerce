@@ -414,7 +414,6 @@ const getProductById = asyncHandler(async (req, res) => {
       ],
     });
 
-    console.log('product:'+product.view_product)
 
     if(product){
       await M_Products.update({
@@ -426,6 +425,22 @@ const getProductById = asyncHandler(async (req, res) => {
         }
       })
     }
+
+    const productVarian = await M_Variant_Product_Detail.findAll({
+      attributes: ["variasi_detail"],
+      where: { product_id: product.id },
+      include: [
+        {
+          model: T_Stocks,
+          as: "t_stok_details",
+          required: false,
+          on: sequelize.literal(
+            "`M_Variant_Product_Detail`.`product_id` = `t_stok_details`.`product_id` AND `M_Variant_Product_Detail`.`variation_id` = `t_stok_details`.`variation_id` AND `t_stok_details`.`deletedAt` IS NULL AND (`M_Variant_Product_Detail`.`warna` = `t_stok_details`.`warna` OR (`M_Variant_Product_Detail`.`warna` IS NULL AND `t_stok_details`.`warna` IS NULL)) AND (`M_Variant_Product_Detail`.`ukuran` = `t_stok_details`.`ukuran` OR (`M_Variant_Product_Detail`.`ukuran` IS NULL AND `t_stok_details`.`ukuran` IS NULL)) AND (`M_Variant_Product_Detail`.`lain_lain` = `t_stok_details`.`lain_lain` OR (`M_Variant_Product_Detail`.`lain_lain` IS NULL AND `t_stok_details`.`lain_lain` IS NULL))"
+          ),
+        },
+      ],
+      group: ["variasi_detail"],
+    });
 
     const productDetail = await M_Variant_Product_Detail.findAll({
       where: { product_id: product.id },
@@ -440,23 +455,6 @@ const getProductById = asyncHandler(async (req, res) => {
         },
       ],
     });
-    
-    const productSize = await M_Variant_Product_Detail.findAll({
-      attributes: ["ukuran"],
-      where: { product_id: product.id },
-      include: [
-        {
-          model: T_Stocks,
-          as: "t_stok_details",
-          required: false,
-          on: sequelize.literal(
-            "`M_Variant_Product_Detail`.`product_id` = `t_stok_details`.`product_id` AND `M_Variant_Product_Detail`.`variation_id` = `t_stok_details`.`variation_id` AND `t_stok_details`.`deletedAt` IS NULL AND (`M_Variant_Product_Detail`.`warna` = `t_stok_details`.`warna` OR (`M_Variant_Product_Detail`.`warna` IS NULL AND `t_stok_details`.`warna` IS NULL)) AND (`M_Variant_Product_Detail`.`ukuran` = `t_stok_details`.`ukuran` OR (`M_Variant_Product_Detail`.`ukuran` IS NULL AND `t_stok_details`.`ukuran` IS NULL)) AND (`M_Variant_Product_Detail`.`lain_lain` = `t_stok_details`.`lain_lain` OR (`M_Variant_Product_Detail`.`lain_lain` IS NULL AND `t_stok_details`.`lain_lain` IS NULL))"
-          ),
-        },
-      ],
-      group: ["ukuran"],
-    });
-    
 
     const category = await M_Categories.findOne({
       where: {
@@ -483,9 +481,9 @@ const getProductById = asyncHandler(async (req, res) => {
       message: "Get Detail Product Success!",
       product: product,
       productDetail: productDetail,
-      productSize: productSize,
       category: category,
       productReviews: productReviews,
+      variants:productVarian
     });
   } catch (error) {
     console.error(error.message);
@@ -653,6 +651,96 @@ const getHargaById = asyncHandler(async(req, res) => {
   }
 })
 
+const getWarnaProduct = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id } = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findAll({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id
+      },
+      attributes: ['warna']
+    })
+    console.log('variantBarangDetails')
+    console.log(productDetail.id)
+    console.log(variant_id);
+    
+    console.log(variantBarangDetails)
+
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+  
+const getUkuranProduct = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id, warna } = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findAll({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id,
+        warna: warna
+      },
+      attributes: ['ukuran']
+    })
+    
+
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
+const getHargaProduct = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id,  warna, ukuran, cart} = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findOne({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      },
+      attributes: ['harga']
+    })
+    
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
 module.exports = {
   getProductByCategories,
   getProductByPopular,
@@ -664,5 +752,8 @@ module.exports = {
   getWarnaById,
   getUkuranById,
   getHargaById,
-  getTopViewProduct
+  getTopViewProduct,
+  getWarnaProduct,
+  getUkuranProduct,
+  getHargaProduct
 };

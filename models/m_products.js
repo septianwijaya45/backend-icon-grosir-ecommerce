@@ -59,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       diskon_tipe: DataTypes.STRING,
       status_barang: DataTypes.INTEGER,
       image: DataTypes.TEXT,
+      video: DataTypes.TEXT,
       view_product: DataTypes.INTEGER,
     },
     {

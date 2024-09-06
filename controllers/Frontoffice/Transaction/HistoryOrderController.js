@@ -38,7 +38,8 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 vpd.lain_lain AS 'lain_lain',
                 vpd.harga AS 'harga',
                 ue.name,
-                c.alamat
+                c.alamat,
+                me.ekspedisi
             FROM 
                 t_transaksies as t
             INNER JOIN 
@@ -47,6 +48,8 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 M_Products as p ON td.product_id = p.id AND p.deletedAt IS NULL
             INNER JOIN
                 user_ecommerces as ue ON ue.id = t.user_ecommerce_id
+            INNER JOIN
+                M_Ekspedisis as me ON me.id = t.ekspedisi_id
             LEFT JOIN
                 m_customers as c ON c.user_ecommerce_id = t.user_ecommerce_id
             LEFT JOIN 

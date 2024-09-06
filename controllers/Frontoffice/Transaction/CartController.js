@@ -25,7 +25,7 @@ const getCart = asyncHandler(async (req, res) => {
         let id = user.id
 
         const query = `
-            SELECT 
+            SELECT  DISTINCT
                 cd.id,
                 cd.variant_id,
                 cd.varian,
@@ -41,9 +41,6 @@ const getCart = asyncHandler(async (req, res) => {
                 cd.variant_id,
                 cd.qty,
                 v.variasi AS 'variasi',
-                vpd.warna AS 'warna',
-                vpd.ukuran AS 'ukuran',
-                vpd.lain_lain AS 'lain_lain',
                 vpd.harga AS 'harga'
             FROM 
                 t_carts as c
@@ -57,8 +54,9 @@ const getCart = asyncHandler(async (req, res) => {
                 M_Variant_Product_Details as vpd ON v.id = vpd.variation_id AND vpd.deletedAt IS NULL AND p.id = vpd.product_id AND vpd.deletedAt IS NULL
             WHERE 
                 cd.deletedAt IS NULL 
-                
                 AND c.user_ecommerce_id = :id
+            GROUP BY
+                cd.id
             ORDER BY 
                 cd.id;
         `;
@@ -306,6 +304,7 @@ const updateCart = asyncHandler(async (req, res) => {
               varian: variant_id 
             },
         })
+        // console.log(updateDetail)
 
         if (!updateDetail) {
             return res.status(404).json({
@@ -317,7 +316,14 @@ const updateCart = asyncHandler(async (req, res) => {
         const newQty = parseInt(qty, 10);
         const update = await T_Cart_Details.update(
             { qty: newQty },
-            { where: { id: id, cart_id: getCart.id, product_id: product.id, varian: variant_id } }
+            { 
+              where: { 
+                id: id, 
+                cart_id: getCart.id, 
+                product_id: product.id, 
+                varian: variant_id 
+              } 
+            }
         );
 
         if (update[0] === 0) {
@@ -407,10 +413,9 @@ const getVarianById = asyncHandler(async (req, res) => {
   
       const variantBarangDetails = await M_Variant_Product_Detail.findAll({
         where: {product_id: productDetail.id},
-        attributes: ['variasi_detail']
+        attributes: ['variasi_detail'],
+        group: ['variasi_detail']
       })
-      console.log('variankua')
-      console.log(variantBarangDetails)
   
       res.status(200).json(variantBarangDetails);
       
@@ -423,131 +428,273 @@ const getVarianById = asyncHandler(async (req, res) => {
     }
   });
   
-  const getWarnaById = asyncHandler(async(req, res) => {
-    try {
-      const { product_id, variant_id, cart } = req.params;
-      const productDetail = await M_Products.findOne({
-        where: {
-          uuid: product_id
-        }
-      })
+const getWarnaById = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id, cart } = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    await T_Cart_Details.update({
+      varian: variant_id,
+    }, {
+      where: {
+        id: cart,
+        product_id: productDetail.id
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findAll({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id
+      },
+      attributes: ['warna']
+    })
+
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
   
-      await T_Cart_Details.update({
-        varian: variant_id,
-      }, {
-        where: {
-          id: cart,
-          product_id: productDetail.id
-        }
-      })
-  
-      const variantBarangDetails = await M_Variant_Product_Detail.findAll({
-        where: {
-          product_id: productDetail.id,
-          variasi_detail: variant_id
-        },
-        attributes: ['warna']
-      })
-  
-      res.status(200).json(variantBarangDetails);
-    } catch (error) {
-      console.error("Error fetching wishlists:", error);
-      res.status(500).json({
-        message: "Internal Server Error! Please Contact Developer",
-        status: false,
-      });
-    }
-  })
-  
-  const getUkuranById = asyncHandler(async(req, res) => {
-    try {
-      const { product_id, variant_id, warna, cart } = req.params;
-      const productDetail = await M_Products.findOne({
-        where: {
-          uuid: product_id
-        }
-      })
-  
-      await T_Cart_Details.update({
+const getUkuranById = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id, warna, cart } = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    await T_Cart_Details.update({
+      warna: warna
+    }, {
+      where: {
+        id: cart,
+        product_id: productDetail.id,
+        varian: variant_id
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findAll({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id,
         warna: warna
-      }, {
-        where: {
-          id: cart,
-          product_id: productDetail.id,
-          varian: variant_id
-        }
-      })
+      },
+      attributes: ['ukuran']
+    })
+    console.log(productDetail.id)
+    console.log(variant_id);
+    console.log(warna);
+    
+    
+    console.log('ukuranku')
+    console.log(variantBarangDetails);
+    
+
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
   
-      const variantBarangDetails = await M_Variant_Product_Detail.findAll({
-        where: {
-          product_id: productDetail.id,
-          variasi_detail: variant_id,
-          warna: warna
-        },
-        attributes: ['ukuran']
-      })
-  
-      res.status(200).json(variantBarangDetails);
-    } catch (error) {
-      console.error("Error fetching wishlists:", error);
-      res.status(500).json({
-        message: "Internal Server Error! Please Contact Developer",
-        status: false,
+const getHargaById = asyncHandler(async(req, res) => {
+  try {
+    const { product_id, variant_id,  warna, ukuran, cart} = req.params;
+    const productDetail = await M_Products.findOne({
+      where: {
+        uuid: product_id
+      }
+    })
+
+    await T_Wishlist_Details.update({
+      ukuran: ukuran,
+    }, {
+      where: {
+        id: cart,
+        product_id: productDetail.id,
+        varian: variant_id,
+        warna: warna
+      }
+    })
+
+    const variantBarangDetails = await M_Variant_Product_Detail.findOne({
+      where: {
+        product_id: productDetail.id,
+        variasi_detail: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      },
+      attributes: ['harga']
+    })
+
+    await T_Cart_Details.update({
+      price: variantBarangDetails.harga
+    }, {
+      where: {
+        id: cart,
+        product_id: productDetail.id,
+        varian: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      }
+    })
+    
+    res.status(200).json(variantBarangDetails);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
+const duplicateProduct = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const getCartDetail = await T_Cart_Details.findOne({
+      where: {
+        id: id
+      }
+    })
+
+    if (!getCartDetail) {
+      return res.status(404).json({
+          message: "Detail keranjang tidak ditemukan!",
+          status: false,
       });
     }
-  })
-  
-  const getHargaById = asyncHandler(async(req, res) => {
-    try {
-      const { product_id, variant_id,  warna, ukuran, cart} = req.params;
-      const productDetail = await M_Products.findOne({
-        where: {
-          uuid: product_id
-        }
+
+    const getDuplicateProduct = await T_Cart_Details.create({
+      cart_id   : getCartDetail.cart_id,
+      product_id: getCartDetail.product_id,
+      variant_id: getCartDetail.variant_id,
+      price     : getCartDetail.price,
+      qty       : 1,
+      varian    : getCartDetail.varian,
+      warna     : getCartDetail.warna,
+      ukuran    : getCartDetail.ukuran
+    })
+
+    // const variants = await M_Variant_Product_Detail.findAll({
+    //   where: {
+    //     product_id: getCartDetail.product_id
+    //   },
+    //   attributes: ['variasi_detail'],
+    //   group: ['variasi_detail']
+    // })
+
+    // const warnas = await M_Variant_Product_Detail.findAll({
+    //   where: {
+    //     product_id: getCartDetail.product_id,
+    //     variasi_detail: getCartDetail.varian
+    //   },
+    //   attributes: ['warna']
+    // })
+
+    // const ukurans = await M_Variant_Product_Detail.findAll({
+    //   where: {
+    //     product_id: getCartDetail.product_id,
+    //     variasi_detail: getCartDetail.varian,
+    //     warna: getCartDetail.warna
+    //   },
+    //   attributes: ['warna']
+    // })
+
+    res.status(200).json({
+      message: "Duplicate Product Cart Success!",
+      status: true,
+      product: getDuplicateProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
+const createCartByDetailProduct = asyncHandler(async (req, res) => {
+  try {
+      const { product_id, variant_id, warna, ukuran, qty } = req.params;
+
+      const user = await User_Ecommerces.findOne({
+          where: { no_telepon: req.user.username }
+      });
+
+      const product = await M_Products.findOne({
+          where: {
+              uuid: product_id,
+              deletedAt: null,
+          }
+      });
+
+      const checkCart = await T_Carts.findOne({
+          where: {user_ecommerce_id: user.id, status: 0}
       })
-  
-      await T_Wishlist_Details.update({
-        ukuran: ukuran,
-      }, {
-        where: {
-          id: cart,
-          product_id: productDetail.id,
-          varian: variant_id,
-          warna: warna
-        }
-      })
-  
+
       const variantBarangDetails = await M_Variant_Product_Detail.findOne({
         where: {
-          product_id: productDetail.id,
+          product_id: product.id,
           variasi_detail: variant_id,
           warna: warna,
           ukuran: ukuran
         },
-        attributes: ['harga']
       })
-  
-      await T_Cart_Details.update({
-        price: variantBarangDetails.harga
-      }, {
-        where: {
-          id: cart,
-          product_id: productDetail.id,
-          varian: variant_id,
-          warna: warna,
-          ukuran: ukuran
-        }
-      })
-      
-      res.status(200).json(variantBarangDetails);
-    } catch (error) {
-      console.error("Error fetching wishlists:", error);
+
+      if(!checkCart){
+          const cart = await T_Carts.create({
+              user_ecommerce_id: user.id,
+              status: 0
+          });
+          const cartDetail = await T_Cart_Details.create({
+              cart_id: cart.id,
+              product_id: product.id,
+              variant_id: variantBarangDetails.variation_id,
+              price     : variantBarangDetails.harga,
+              qty       : qty,
+              varian: variant_id,
+              warna: warna,
+              ukuran: ukuran
+          })
+      }else{
+          const cartDetail = await T_Cart_Details.create({
+              cart_id: checkCart.id,
+              product_id: product.id,
+              variant_id: variantBarangDetails.variation_id,
+              price     : variantBarangDetails.harga,
+              qty       : qty,
+              varian: variant_id,
+              warna: warna,
+              ukuran: ukuran
+          })
+      }
+
+      res.status(200).json({
+          message: "Send To Cart Success!",
+          status: true
+        });        
+  } catch (error) {
+      console.error(error.message);
       res.status(500).json({
         message: "Internal Server Error! Please Contact Developer",
-        status: false,
       });
     }
-  })
+})
 
 module.exports = {
     createCart,
@@ -558,5 +705,7 @@ module.exports = {
     getVarianById,
     getWarnaById,
     getUkuranById,
-    getHargaById
+    getHargaById,
+    duplicateProduct,
+    createCartByDetailProduct
 };

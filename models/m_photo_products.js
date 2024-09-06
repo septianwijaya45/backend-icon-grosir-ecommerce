@@ -10,13 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       M_Photo_Products.belongsTo(models.M_Products, {
         foreignKey: "product_id",
-        as: "photos",
+        as: "products",
       });
     }
   }
   M_Photo_Products.init(
     {
       product_id: DataTypes.INTEGER,
+      varian_product_detail_id: DataTypes.INTEGER,
       nama_file: DataTypes.TEXT,
     },
     {

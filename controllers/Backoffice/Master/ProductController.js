@@ -42,22 +42,14 @@ const createProduct = asyncHandler(async (req, res) => {
       deskripsi,
       minimal_pembelian,
       status_barang,
+      satuan_berat,
       varian,
       warna,
       ukuran,
-      lain_lain,
       harga,
       stok,
-      foto_1,
-      foto_2,
-      foto_3,
-      foto_4,
-      foto_5,
-      foto_6,
-      foto_7,
-      foto_8,
-      foto_9,
-      foto_10,
+      foto,
+      image,
       video,
     } = req.body;
 
@@ -70,51 +62,60 @@ const createProduct = asyncHandler(async (req, res) => {
       minimum_pemesanan: minimal_pembelian,
       diskon_tipe: null,
       status_barang: status_barang,
+      satuan_berat: satuan_berat,
+      image: image,
+      video:video,
+      harga: harga[0]
     };
 
     const product = await M_Products.create(dataProduct);
 
     if (varian.length != 0) {
       for (let i = 0; i < varian.length; i++) {
-        let getVarian
-        if(varian[i] == 'standard'){
-          getVarian = await M_Variations.findOne({
-            where: {
-              variasi: {
-                [Op.like]: "%standard%",
+        let getVarian = await M_Variations.findOne({
+          where: { id: varian[i] },
+        });
+
+          await M_Variation_Products.create({
+            variation_id: getVarian.id,
+            product_id: product.id,
+          });
+  
+          await M_Variant_Product_Detail.create({
+            variation_id: getVarian.id,
+            product_id: product.id,
+            variasi_detail: getVarian.variasi,
+            warna: warna[i],
+            ukuran: ukuran[i],
+            harga: harga[i],
+          });
+  
+          await T_Stocks.create({
+            variation_id: getVarian.id,
+            product_id: product.id,
+            warna: warna[i],
+            ukuran: ukuran[i],
+            stock: stok[i],
+          });
+
+          if (foto && foto != null) {
+            let getVarianProductDetail = await M_Variant_Product_Detail.findOne({
+              where: { 
+                variation_id: getVarian.id,
+                product_id: product.id,
+                variasi_detail: getVarian.variasi,
+                warna: warna[i],
+                ukuran: ukuran[i],
+                harga: harga[i],
               },
-            },
-          });
-        }else{
-          getVarian = await M_Variations.findOne({
-            where: { id: varian[i] },
-          });
-        }
-
-        await M_Variation_Products.create({
-          variation_id: getVarian.id,
-          product_id: product.id,
-        });
-
-        await M_Variant_Product_Detail.create({
-          variation_id: getVarian.id,
-          product_id: product.id,
-          variasi_detail: getVarian.variasi,
-          warna: warna[i],
-          ukuran: ukuran[i],
-          lain_lain: lain_lain[i],
-          harga: harga[i],
-        });
-
-        await T_Stocks.create({
-          variation_id: getVarian.id,
-          product_id: product.id,
-          warna: warna[i],
-          ukuran: ukuran[i],
-          lain_lain: lain_lain[i],
-          stock: stok[i],
-        });
-      }
+            });
+            await M_Photo_Products.create({
+              product_id: product.id,
+              varian_product_detail_id: getVarianProductDetail.id,
+              nama_file: foto[i],
+            });
+          }
+      } 
     }
 
     if (ukuran.length != 0) {
@@ -130,75 +131,9 @@ const createProduct = asyncHandler(async (req, res) => {
       }
     }
 
-    if (foto_1 && foto_1 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_1,
-      });
-    }
-    if (foto_2 && foto_2 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_2,
-      });
-    }
-    if (foto_3 && foto_3 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_3,
-      });
-    }
-    if (foto_4 && foto_4 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_4,
-      });
-    }
-    if (foto_5 && foto_5 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_5,
-      });
-    }
-    if (foto_6 && foto_6 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_6,
-      });
-    }
-    if (foto_7 && foto_7 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_7,
-      });
-    }
-    if (foto_8 && foto_8 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_8,
-      });
-    }
-    if (foto_9 && foto_9 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_9,
-      });
-    }
-    if (foto_10 && foto_10 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_10,
-      });
-    }
-    if (video && video != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: video,
-      });
-    }
 
     res.status(200).json({
-      message: "Get Data Success!",
+      message: "Berhasil Menyimpan Data!",
       data: product,
     });
   } catch (error) {
@@ -276,8 +211,15 @@ const getProductById = asyncHandler(async (req, res) => {
             "`M_Variant_Product_Detail`.`product_id` = `t_stok_details`.`product_id` AND `M_Variant_Product_Detail`.`variation_id` = `t_stok_details`.`variation_id` AND `t_stok_details`.`deletedAt` IS NULL AND (`M_Variant_Product_Detail`.`warna` = `t_stok_details`.`warna` OR (`M_Variant_Product_Detail`.`warna` IS NULL AND `t_stok_details`.`warna` IS NULL)) AND (`M_Variant_Product_Detail`.`ukuran` = `t_stok_details`.`ukuran` OR (`M_Variant_Product_Detail`.`ukuran` IS NULL AND `t_stok_details`.`ukuran` IS NULL)) AND (`M_Variant_Product_Detail`.`lain_lain` = `t_stok_details`.`lain_lain` OR (`M_Variant_Product_Detail`.`lain_lain` IS NULL AND `t_stok_details`.`lain_lain` IS NULL))"
           ),
         },
+        {
+          model: M_Photo_Products,
+          as: "photos",
+          where: { product_id: product.id },
+          required: false
+        }
       ],
     });
+    
 
 
     const stock = await T_Stocks.findOne({
@@ -310,6 +252,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       deskripsi,
       minimal_pembelian,
       status_barang,
+      satuan_berat,
       varian,
       variant_id,
       warna,
@@ -320,16 +263,8 @@ const updateProduct = asyncHandler(async (req, res) => {
       lain_lainBefore,
       harga,
       stok,
-      foto_1,
-      foto_2,
-      foto_3,
-      foto_4,
-      foto_5,
-      foto_6,
-      foto_7,
-      foto_8,
-      foto_9,
-      foto_10,
+      foto,
+      image,
       video,
     } = req.body;
 
@@ -341,7 +276,17 @@ const updateProduct = asyncHandler(async (req, res) => {
       minimum_pemesanan: minimal_pembelian,
       diskon_tipe: null,
       status_barang: status_barang,
+      satuan_berat: satuan_berat,
+      harga: harga[0]
     };
+
+    if (image) {
+      dataProduct.image = image;
+    }
+    
+    if (video) {
+      dataProduct.video = video;
+    }
 
     const product = await M_Products.findOne({ where: { uuid: uuid } });
 
@@ -353,20 +298,9 @@ const updateProduct = asyncHandler(async (req, res) => {
 
     if (varian.length != 0) {
       for (let i = 0; i < varian.length; i++) {
-        let getVarian;
-        if (varian[i] == "standard") {
-          getVarian = await M_Variations.findOne({
-            where: {
-              variasi: {
-                [Op.like]: "%standard%",
-              },
-            },
-          });
-        } else {
-          getVarian = await M_Variations.findOne({
-            where: { id: varian[i] },
-          });
-        }
+        let getVarian = await M_Variations.findOne({
+          where: { id: varian[i] },
+        });
 
         if (
           variant_id[i] !== null &&
@@ -391,7 +325,6 @@ const updateProduct = asyncHandler(async (req, res) => {
               product_id: product.id,
               warna: warnaBefore[i],
               ukuran: ukuranBefore[i],
-              lain_lain: lain_lainBefore[i],
             },
           }).then((variantProductDetail) => {
             return variantProductDetail.update({
@@ -400,7 +333,6 @@ const updateProduct = asyncHandler(async (req, res) => {
               variasi_detail: getVarian.variasi,
               warna: warna[i],
               ukuran: ukuran[i],
-              lain_lain: lain_lain[i],
               harga: harga[i],
             });
           });
@@ -412,7 +344,6 @@ const updateProduct = asyncHandler(async (req, res) => {
               product_id: product.id,
               warna: warnaBefore[i],
               ukuran: ukuranBefore[i],
-              lain_lain: lain_lainBefore[i],
             },
           }).then((stok) => {
             return stok.update({
@@ -420,7 +351,6 @@ const updateProduct = asyncHandler(async (req, res) => {
               product_id: product.id,
               warna: warna[i],
               ukuran: ukuran[i],
-              lain_lain: lain_lain[i],
               stock: stok[i],
             });
           });
@@ -437,7 +367,6 @@ const updateProduct = asyncHandler(async (req, res) => {
             variasi_detail: getVarian.variasi,
             warna: warna[i],
             ukuran: ukuran[i],
-            lain_lain: lain_lain[i],
             harga: harga[i],
           });
 
@@ -446,9 +375,46 @@ const updateProduct = asyncHandler(async (req, res) => {
             product_id: product.id,
             warna: warna[i],
             ukuran: ukuran[i],
-            lain_lain: lain_lain[i],
             stock: stok[i],
           });
+        }
+
+        if (foto && foto != null && foto.length != 0) {
+          let getVarianProductDetail = await M_Variant_Product_Detail.findOne({
+            where: { 
+              variation_id: getVarian.id,
+              product_id: product.id,
+              variasi_detail: getVarian.variasi,
+              warna: warna[i],
+              ukuran: ukuran[i],
+              harga: harga[i],
+            },
+          });
+
+          // delete foto sebelumnya
+          let checkProduct = await M_Photo_Products.findOne({
+            where: {
+              product_id: product.id,
+              varian_product_detail_id: getVarianProductDetail.id,
+            }
+          });
+
+          if(checkProduct){
+            await M_Photo_Products.destroy({
+              where: {
+                product_id: product.id,
+                varian_product_detail_id: getVarianProductDetail.id,
+              }
+            });            
+          }
+
+          if(foto[i] != null && foto[i] != ''){
+            await M_Photo_Products.create({
+              product_id: product.id,
+              varian_product_detail_id: getVarianProductDetail.id,
+              nama_file: foto[i],
+            });
+          }
         }
       }
     }
@@ -484,73 +450,6 @@ const updateProduct = asyncHandler(async (req, res) => {
           });
         }
       }
-    }
-
-    if (foto_1 && foto_1 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_1,
-      });
-    }
-    if (foto_2 && foto_2 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_2,
-      });
-    }
-    if (foto_3 && foto_3 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_3,
-      });
-    }
-    if (foto_4 && foto_4 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_4,
-      });
-    }
-    if (foto_5 && foto_5 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_5,
-      });
-    }
-    if (foto_6 && foto_6 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_6,
-      });
-    }
-    if (foto_7 && foto_7 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_7,
-      });
-    }
-    if (foto_8 && foto_8 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_8,
-      });
-    }
-    if (foto_9 && foto_9 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_9,
-      });
-    }
-    if (foto_10 && foto_10 != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: foto_10,
-      });
-    }
-    if (video && video != null) {
-      M_Photo_Products.create({
-        product_id: product.id,
-        nama_file: video,
-      });
     }
 
     res.status(200).json({

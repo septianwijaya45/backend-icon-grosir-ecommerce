@@ -82,9 +82,6 @@ const createWishlist = asyncHandler(async (req, res) => {
           },
           order: [['id', 'ASC']]
         })
-        console.log('variantProductDetail');
-        console.log(variantProductDetail);
-        console.log(variantProductDetail.variasi_detail);
         
 
         // Find or create wishlist for the user
@@ -92,8 +89,6 @@ const createWishlist = asyncHandler(async (req, res) => {
             where: { user_ecommerce_id:user.id },
             attributes: ['id'],
         });
-
-
 
         if (!wishlist) {
             wishlist = await T_Wishlists.create({
@@ -281,10 +276,101 @@ const deleteWishlist = asyncHandler(async (req, res) => {
   }
 })
   
+const createWishlistByProductDetail = asyncHandler(async (req, res) => {
+  try {
+    const { product_id, variant_id, warna, ukuran, qty } = req.params;
+
+    const user = await User_Ecommerces.findOne({
+        where: { no_telepon: req.user.username }
+    });
+
+    const product = await M_Products.findOne({
+        where: {
+            uuid: product_id,
+            deletedAt: null,
+        }
+    })
+
+    const variation = await M_Variations.findOne({
+      where:{
+        variasi: variant_id
+      }
+    })
+
+    const variantProductDetail = await M_Variant_Product_Detail.findOne({
+      where: {
+        variation_id: variation.id,
+        product_id: product.id,
+        variasi_detail: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      },
+      order: [['id', 'ASC']]
+    })
+
+    let wishlist = await T_Wishlists.findOne({
+        where: { user_ecommerce_id:user.id },
+        attributes: ['id'],
+    });
+
+    if (!wishlist) {
+      wishlist = await T_Wishlists.create({
+          user_ecommerce_id: user.id,
+          status: 0,
+      });
+    }
+
+    const checkWishlistDetail = await T_Wishlist_Details.findOne({
+      where: { 
+        wishlist_id: wishlist.id, 
+        product_id: product.id,
+        varian: variant_id,
+        warna: warna,
+        ukuran: ukuran
+      },
+      attributes: ['id', 'qty'],
+    });
+
+    if (!checkWishlistDetail) {
+        await T_Wishlist_Details.create({
+            wishlist_id: wishlist.id,
+            product_id: product.id,
+            variant_id: variation.id,
+            price: variantProductDetail.harga,
+            qty: qty,
+            varian: variant_id,
+            warna: warna,
+            ukuran: ukuran
+        });
+    }else{
+      await T_Wishlist_Details.update(
+          { qty: qty},
+          { 
+            where: { 
+              id: checkWishlistDetail.id
+            }
+          }
+      );
+    }
+
+    res.status(200).json({
+        message: "Send To Wishlist Success!",
+        status: true,
+    });
+    
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
 
 module.exports = {
     createWishlist,
     getWishlist,
     deleteWishlist,
-    updateQtyWishlist
+    updateQtyWishlist,
+    createWishlistByProductDetail
 };
