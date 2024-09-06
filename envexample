@@ -1,0 +1,6 @@
+PORT=3001
+SECRET_ACCESS_KEY=SECRET_ACCESS_KEY
+URL_API_POS=https://iniapi.com/api
+
+#development
+URL_API_POS_DEV=http://127.0.0.1:8002/api/

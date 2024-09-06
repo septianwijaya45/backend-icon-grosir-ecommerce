@@ -1,4 +1,4 @@
-npm i express express-async-handler cors jsonwebtoken bcrypt nodemon dotenv sequelize sequelize-cli multer
+npm i express express-async-handler cors jsonwebtoken bcrypt nodemon dotenv sequelize sequelize-cli multer uuid mysql2 express-session
 
 // create user 
 npx sequelize-cli model:generate --name User --attributes name:string,email:string,password:string
@@ -6,6 +6,10 @@ npx sequelize-cli model:generate --name User --attributes name:string,email:stri
 // create departement
 npx sequelize-cli model:generate --name Departement --attributes departementId:integer,departementN
 ame:string,managerId:integer
+
+// create migration add columnn
+npx sequelize-cli migration:generate --name add_column_to_table
+
 
 // create manager
 
