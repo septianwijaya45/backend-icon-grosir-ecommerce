@@ -4,26 +4,26 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.addColumn("t_wishlist_details", "varian", {
+      queryInterface.addColumn("T_Wishlist_Details", "varian", {
         type: Sequelize.DataTypes.STRING,
         after: 'qty'
       }),
-      queryInterface.addColumn("t_wishlist_details", "warna", {
+      queryInterface.addColumn("T_Wishlist_Details", "warna", {
         type: Sequelize.DataTypes.STRING,
-        after: 'varian'
+        after: 'qty'
       }),
-      queryInterface.addColumn("t_wishlist_details", "ukuran", {
+      queryInterface.addColumn("T_Wishlist_Details", "ukuran", {
         type: Sequelize.DataTypes.STRING,
-        after: 'warna'
+        after: 'qty'
       }),
     ]);
   },
 
   async down (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.removeColumn("t_wishlist_details", "varian"),
-      queryInterface.removeColumn("t_wishlist_details", "warna"),
-      queryInterface.removeColumn("t_wishlist_details", "ukuran"),
+      queryInterface.removeColumn("T_Wishlist_Details", "varian"),
+      queryInterface.removeColumn("T_Wishlist_Details", "warna"),
+      queryInterface.removeColumn("T_Wishlist_Details", "ukuran"),
     ]);
   }
 };

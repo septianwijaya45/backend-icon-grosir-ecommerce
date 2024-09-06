@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.addColumn("m_products", "image", {
+      queryInterface.addColumn("M_Products", "image", {
         type: Sequelize.DataTypes.TEXT,
         after: 'status_barang'
       }),
@@ -13,7 +13,7 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.removeColumn("m_products", "image"),
+      queryInterface.removeColumn("M_Products", "image"),
     ]);
   }
 };
