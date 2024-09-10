@@ -26,13 +26,13 @@ const getTransaksi = asyncHandler(async (req, res) => {
                 e.ekspedisi,
                 ue.name
             FROM 
-                t_transaksies as t
+                T_Transaksies as t
             INNER JOIN
-                user_ecommerces as ue on t.user_ecommerce_id = ue.id
+                User_Ecommerces as ue on t.user_ecommerce_id = ue.id
             INNER JOIN
-                m_customers as c on c.user_ecommerce_id = ue.id
+                M_Customers as c on c.user_ecommerce_id = ue.id
             LEFT JOIN
-                m_ekspedisis e on t.ekspedisi_id = e.id
+                M_Ekspedisis e on t.ekspedisi_id = e.id
             WHERE 
                 t.deletedAt IS NULL 
             ORDER BY 
@@ -92,13 +92,13 @@ const detailTransaksi = asyncHandler(async(req, res) => {
                 c.kota,
                 c.kode_pos
             FROM 
-                t_transaksies as t
+                T_Transaksies as t
             INNER JOIN
-                user_ecommerces as ue on t.user_ecommerce_id = ue.id
+                User_Ecommerces as ue on t.user_ecommerce_id = ue.id
             INNER JOIN
-                m_customers as c on c.user_ecommerce_id = ue.id
+                M_Customers as c on c.user_ecommerce_id = ue.id
             LEFT JOIN
-                m_ekspedisis e on t.ekspedisi_id = e.id
+                M_Ekspedisis e on t.ekspedisi_id = e.id
             WHERE 
                 t.deletedAt IS NULL 
                 AND t.user_ecommerce_id = :id
@@ -126,9 +126,9 @@ const detailTransaksi = asyncHandler(async(req, res) => {
                 vpd.lain_lain AS 'lain_lain',
                 vpd.harga AS 'harga'
             FROM 
-                t_transaksies as t
+                T_Transaksies as t
             INNER JOIN 
-                t_transaksi_details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
+                T_Transaksi_Details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
             INNER JOIN 
                 M_Products as p ON td.product_id = p.id AND p.deletedAt IS NULL
             LEFT JOIN 

@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
         });
         */
         
-        const result = await response.json();
+        // const result = await response.json();
         
         res.status(200).json({
             message: "Data Success Registered!",

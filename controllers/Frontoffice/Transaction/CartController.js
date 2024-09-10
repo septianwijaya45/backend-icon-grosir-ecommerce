@@ -43,9 +43,9 @@ const getCart = asyncHandler(async (req, res) => {
                 v.variasi AS 'variasi',
                 vpd.harga AS 'harga'
             FROM 
-                t_carts as c
+                T_Carts as c
             INNER JOIN 
-                t_cart_details as cd ON c.id = cd.cart_id AND cd.deletedAt IS NULL
+                T_Cart_Details as cd ON c.id = cd.cart_id AND cd.deletedAt IS NULL
             INNER JOIN 
                 M_Products as p ON cd.product_id = p.id AND p.deletedAt IS NULL
             LEFT JOIN 

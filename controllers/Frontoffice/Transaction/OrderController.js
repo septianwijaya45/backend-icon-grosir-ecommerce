@@ -39,9 +39,9 @@ const getMyOrder = asyncHandler(async(req, res) => {
                 vpd.lain_lain AS 'lain_lain',
                 vpd.harga AS 'harga'
             FROM 
-                t_transaksies as t
+                T_Transaksies as t
             INNER JOIN 
-                t_transaksi_details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
+                T_Transaksi_Details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
             INNER JOIN 
                 M_Products as p ON td.product_id = p.id AND p.deletedAt IS NULL
             LEFT JOIN 
