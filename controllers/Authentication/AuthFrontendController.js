@@ -16,6 +16,20 @@ const registerUser = asyncHandler(async (req, res) => {
         } = req.body;
 
         const formattedNoTelepon = no_telepon.startsWith('0') ? '62' + no_telepon.slice(1) : no_telepon;
+
+        let checkUser = await User_Ecommerces.findOne({
+          where: {
+            email: email,
+            no_telepon: formattedNoTelepon
+          }
+        })
+
+        if(checkUser){
+          res.status(200).json({
+            message: "Anda sudah terdaftar!",
+            status: false
+          });
+        }
     
         const createUser = {
             uuid: uuidv4(),
@@ -51,7 +65,8 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(200).json({
             message: "Data Success Registered!",
             status: true,
-            user:user
+            user:user,
+            otp: createOtp
         });
     } catch (error) {
         console.error(error.message);

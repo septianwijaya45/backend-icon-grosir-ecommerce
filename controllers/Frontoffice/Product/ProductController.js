@@ -505,7 +505,8 @@ const getVarianById = asyncHandler(async (req, res) => {
 
     const variantBarangDetails = await M_Variant_Product_Detail.findAll({
       where: {product_id: productDetail.id},
-      attributes: ['variasi_detail']
+      attributes: ['variasi_detail'],
+      group: ['variasi_detail']
     })
 
     res.status(200).json(variantBarangDetails);
@@ -536,11 +537,6 @@ const getWarnaById = asyncHandler(async(req, res) => {
         product_id: productDetail.id
       }
     })
-    console.log('ini update');
-    console.log(variant_id)
-    console.log(wishlish)
-    console.log(productDetail.id)
-    console.log(update)
     
 
     const variantBarangDetails = await M_Variant_Product_Detail.findAll({

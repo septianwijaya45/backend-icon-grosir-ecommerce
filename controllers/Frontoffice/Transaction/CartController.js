@@ -12,7 +12,8 @@ const {
   M_Size_Products,
   T_Carts,
   T_Cart_Details,
-  User_Ecommerces
+  User_Ecommerces,
+  T_Stocks
 } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 const { default: axios } = require("axios");
@@ -177,7 +178,7 @@ const createCart = asyncHandler(async (req, res) => {
 
 const createWishlistCart = asyncHandler(async (req, res) => {
     try {
-        const { id, uuid, variant_id } = req.params;
+        const { id, uuid, variant_id, warna, ukuran } = req.params;
 
         const user = await User_Ecommerces.findOne({
             where: { no_telepon: req.user.username }
@@ -191,7 +192,7 @@ const createWishlistCart = asyncHandler(async (req, res) => {
         });
 
         const checkWishlistDetail = await T_Wishlist_Details.findOne({
-            where: { id: id,  product_id: product.id, variant_id: variant_id },
+            where: { id: id,  product_id: product.id, variant_id: variant_id, warna: warna, ukuran: ukuran },
             attributes: ['id', 'product_id', 'variant_id', 'qty', 'varian', 'warna', 'ukuran'],
         });
         
@@ -288,12 +289,6 @@ const updateCart = asyncHandler(async (req, res) => {
                 status: false,
             });
         }
-
-        console.log('detail cart')
-        console.log(id);
-        console.log(getCart.id);
-        console.log(product.id);
-        console.log(variant_id);
         
 
         const updateDetail = await T_Cart_Details.findOne({
@@ -313,7 +308,21 @@ const updateCart = asyncHandler(async (req, res) => {
             });
         }
 
-        const newQty = parseInt(qty, 10);
+        let checkQty = await T_Stocks.findOne({
+          where: {
+            product_id: product.id,
+            variation_id: updateDetail.variant_id,
+            warna: updateDetail.warna,
+            ukuran: updateDetail.ukuran
+          },
+          attributes: ['stock']
+        })
+
+        let newQty = parseInt(qty, 10);
+        if(newQty > checkQty.stock){
+          newQty = checkQty.stock
+        }
+        
         const update = await T_Cart_Details.update(
             { qty: newQty },
             { 
@@ -325,13 +334,6 @@ const updateCart = asyncHandler(async (req, res) => {
               } 
             }
         );
-
-        if (update[0] === 0) {
-            return res.status(500).json({
-                message: "Gagal memperbarui qty!",
-                status: false,
-            });
-        }
         
         const cartDetails = await T_Cart_Details.findAll({
             where: { cart_id: getCart.id, deletedAt: null },
@@ -346,7 +348,8 @@ const updateCart = asyncHandler(async (req, res) => {
         res.status(200).json({
             message: "Berhasil menambahkan qty!",
             status: true,
-            totalHarga: totalHarga
+            totalHarga: totalHarga,
+            newQty: newQty
         });
     } catch (error) {
         console.error("Error fetching cart:", error);
