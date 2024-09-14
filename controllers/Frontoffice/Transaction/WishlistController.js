@@ -11,7 +11,8 @@ const {
   M_Sizes,
   M_Size_Products,
   T_Wishlists,
-  T_Wishlist_Details
+  T_Wishlist_Details,
+  T_Stocks
 } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 const { default: axios } = require("axios");
@@ -149,15 +150,14 @@ const getWishlist = asyncHandler(async (req, res) => {
           wd.warna,
           wd.ukuran,
           wd.price,
+          wd.product_id,
+          wd.qty,
           p.uuid,
           p.image,
           p.nama_barang AS 'nama_barang',
           w.user_ecommerce_id,
           w.status,
           w.createdAt,
-          wd.product_id,
-          wd.variant_id,
-          wd.qty,
           v.variasi AS 'variasi',
           vpd.warna AS 'warna',
           vpd.ukuran AS 'ukuran',
@@ -171,10 +171,19 @@ const getWishlist = asyncHandler(async (req, res) => {
           M_Products as p ON wd.product_id = p.id AND p.deletedAt IS NULL
       LEFT JOIN 
           M_Variations as v ON wd.variant_id = v.id AND v.deletedAt IS NULL
-      LEFT JOIN 
-          M_Variant_Product_Details as vpd ON v.id = vpd.variation_id AND vpd.deletedAt IS NULL AND p.id = vpd.product_id AND vpd.deletedAt IS NULL
+      LEFT JOIN (
+          SELECT vpd1.*
+          FROM M_Variant_Product_Details vpd1
+          INNER JOIN (
+              SELECT product_id, variation_id, MIN(id) AS min_id, warna, ukuran
+              FROM M_Variant_Product_Details
+              WHERE deletedAt IS NULL
+              GROUP BY product_id, variation_id
+          ) vpd2 ON vpd1.id = vpd2.min_id
+      ) as vpd ON wd.variant_id = vpd.variation_id AND p.id = vpd.product_id AND wd.ukuran = vpd.ukuran AND wd.warna = vpd.warna
       WHERE 
-          wd.deletedAt IS NULL AND w.user_ecommerce_id = :id
+          wd.deletedAt IS NULL 
+          AND w.user_ecommerce_id = 1
       ORDER BY 
           wd.id;
     `;
@@ -183,6 +192,8 @@ const getWishlist = asyncHandler(async (req, res) => {
       replacements: { id },
       type: sequelize.QueryTypes.SELECT
     });
+    console.log('wishlists')
+    console.log(wishlists)
 
     res.status(200).json({
       message: "Get Data Success!",
@@ -205,23 +216,65 @@ const updateQtyWishlist = asyncHandler(async (req, res) => {
         uuid: product_id
       }
     })
-
-    await T_Wishlist_Details.update({
-      qty: qty
-    }, {
+    
+    let getWD = await T_Wishlist_Details.findOne({
       where: {
         id: wishlish,
         product_id: productDetail.id,
         varian: variant_id,
         warna: warna,
         ukuran: ukuran
-      }
+      },
+      attributes: ['variant_id']
     })
-    
-    res.status(200).json({
-        message: "Update Wishlist Success!",
-        status: true,
-    });
+
+    let checkQty = await T_Stocks.findOne({
+      where: {
+        product_id: productDetail.id,
+        variation_id: getWD.variant_id,
+        warna: warna,
+        ukuran: ukuran
+      },
+      attributes: ['stock']
+    })
+
+    if(qty > checkQty.stock){
+      await T_Wishlist_Details.update({
+        qty: checkQty.stock
+      }, {
+        where: {
+          id: wishlish,
+          product_id: productDetail.id,
+          varian: variant_id,
+          warna: warna,
+          ukuran: ukuran
+        }
+      })
+
+      res.status(200).json({
+          message: `Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+          status: false,
+          stock: checkQty.stock
+      });
+    }else{
+      await T_Wishlist_Details.update({
+        qty: qty
+      }, {
+        where: {
+          id: wishlish,
+          product_id: productDetail.id,
+          varian: variant_id,
+          warna: warna,
+          ukuran: ukuran
+        }
+      })
+      
+      res.status(200).json({
+          message: "Update Wishlist Success!",
+          status: true,
+      });
+    }
+
 
   } catch (error) {
     console.error("Error fetching wishlists:", error);

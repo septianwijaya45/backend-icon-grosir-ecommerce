@@ -16,11 +16,29 @@ const { default: axios } = require("axios");
 
 const getAllProduct = asyncHandler(async (req, res) => {
   try {
-    let products = await M_Products.findAll({
-      where: {
-        deletedAt: null,
-      },
+    let query = `SELECT p.*,
+       (SELECT JSON_ARRAYAGG(
+           JSON_OBJECT(
+               'variasi_detail', vpd.variasi_detail, 
+               'warna', vpd.warna, 
+               'ukuran', vpd.ukuran, 
+               'harga', vpd.harga
+           )
+        )
+        FROM M_Variant_Product_Details vpd
+        WHERE vpd.product_id = p.id AND vpd.deletedAt IS NULL
+       ) AS details
+      FROM M_Products p
+      LEFT JOIN M_Variation_Products vp ON p.id = vp.product_id
+      LEFT JOIN M_Variations v ON v.id = vp.variation_id
+      WHERE p.deletedAt IS NULL
+        AND vp.deletedAt IS NULL
+      GROUP BY p.artikel;
+    `
+    const products = await sequelize.query(query, {
+        type: sequelize.QueryTypes.SELECT
     });
+    
     res.status(200).json({
       message: "Get Data Success!",
       data: products,
@@ -67,6 +85,19 @@ const createProduct = asyncHandler(async (req, res) => {
       video:video,
       harga: harga[0]
     };
+
+    let checkProduct = await M_Products.findOne({
+      where:{
+        artikel: artikel
+      }
+    })
+
+    if(checkProduct){
+      res.status(200).json({
+        status: false,
+        message: "Berhasil Menyimpan Data!"
+      });
+    }
 
     const product = await M_Products.create(dataProduct);
 
@@ -133,6 +164,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 
     res.status(200).json({
+      status: true,
       message: "Berhasil Menyimpan Data!",
       data: product,
     });

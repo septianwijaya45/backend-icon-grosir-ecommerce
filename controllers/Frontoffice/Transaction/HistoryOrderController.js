@@ -41,13 +41,13 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 c.alamat,
                 me.ekspedisi
             FROM 
-                t_transaksies as t
+                T_Transaksies as t
             INNER JOIN 
-                t_transaksi_details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
+                T_Transaksi_Details as td ON t.id = td.transaksi_id AND td.deletedAt IS NULL
             INNER JOIN 
                 M_Products as p ON td.product_id = p.id AND p.deletedAt IS NULL
             INNER JOIN
-                user_ecommerces as ue ON ue.id = t.user_ecommerce_id
+                User_Ecommerces as ue ON ue.id = t.user_ecommerce_id
             INNER JOIN
                 M_Ekspedisis as me ON me.id = t.ekspedisi_id
             LEFT JOIN

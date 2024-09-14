@@ -7,7 +7,7 @@ router.use(authenticateToken);
 router.route("/get-cart").get(getCart);
 router.route("/create-cart/:id").get(createCart);
 router.route("/update-qty-cart/:id/:uuid/:variant_id").post(updateCart);
-router.route("/create-cart-by-wishlist/:id/:uuid/:variant_id").get(createWishlistCart);
+router.route("/create-cart-by-wishlist/:id/:uuid/:variant_id/:warna/:ukuran").get(createWishlistCart);
 router.route("/delete-cart/:id").delete(deleteCart);
 router.route("/duplicate-data/:id").get(duplicateProduct);
 
