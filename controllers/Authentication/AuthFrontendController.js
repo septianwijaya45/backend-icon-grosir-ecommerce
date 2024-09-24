@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { User_Ecommerces, user_confirm_otp } = require("../../models/");
+const { User_Ecommerces, user_confirm_otp, M_Customers } = require("../../models/");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
@@ -53,6 +53,20 @@ const registerUser = asyncHandler(async (req, res) => {
         }
     
         const user = await User_Ecommerces.create(createUser);
+
+        const customerData = {
+          user_ecommerce_id: user.id,
+          first_name: name,
+          last_name: '',
+          no_telepon: formattedNoTelepon,
+          alamat: '-',
+          kota: '-',
+          kode_pos: '-',
+          jenis_kelamin: '-',
+          foto_profil: "default.png",
+        };
+
+        const customer = await M_Customers.create(customerData)
     
         const createOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
