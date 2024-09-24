@@ -50,8 +50,6 @@ const updateDataById = asyncHandler(async(req, res) => {
     try {
         const { id } = req.params;
         const { image } = req.body;
-        console.log(req.id)
-        console.log(req.body)
 
         const banner = await M_Banner.update({
             image: image
