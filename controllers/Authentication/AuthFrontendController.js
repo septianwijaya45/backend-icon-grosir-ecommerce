@@ -17,14 +17,26 @@ const registerUser = asyncHandler(async (req, res) => {
 
         const formattedNoTelepon = no_telepon.startsWith('0') ? '62' + no_telepon.slice(1) : no_telepon;
 
-        let checkUser = await User_Ecommerces.findOne({
+        let checkUserEmail = await User_Ecommerces.findOne({
           where: {
-            email: email,
+            email: email
+          }
+        })
+
+        if(checkUserEmail){
+          res.status(200).json({
+            message: "Anda sudah terdaftar!",
+            status: false
+          });
+        }
+
+        let checkUserTelepon = await User_Ecommerces.findOne({
+          where: {
             no_telepon: formattedNoTelepon
           }
         })
 
-        if(checkUser){
+        if(checkUserTelepon){
           res.status(200).json({
             message: "Anda sudah terdaftar!",
             status: false
