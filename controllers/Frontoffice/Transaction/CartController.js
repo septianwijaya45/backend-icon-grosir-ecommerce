@@ -659,6 +659,16 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
         },
       })
 
+      let checkQty = await T_Stocks.findOne({
+        where: {
+          product_id: product.id,
+          variation_id: variantBarangDetails.variation_id,
+          warna: warna,
+          ukuran: ukuran
+        },
+        attributes: ['stock']
+      })
+
       if(!checkCart){
           const cart = await T_Carts.create({
               user_ecommerce_id: user.id,
@@ -669,7 +679,7 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
               product_id: product.id,
               variant_id: variantBarangDetails.variation_id,
               price     : variantBarangDetails.harga,
-              qty       : qty,
+              qty       : (qty > checkQty.stock) ? checkQty.stock : qty,
               varian: variant_id,
               warna: warna,
               ukuran: ukuran
@@ -680,17 +690,26 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
               product_id: product.id,
               variant_id: variantBarangDetails.variation_id,
               price     : variantBarangDetails.harga,
-              qty       : qty,
+              qty       : (qty > checkQty.stock) ? checkQty.stock : qty,
               varian: variant_id,
               warna: warna,
               ukuran: ukuran
           })
       }
 
-      res.status(200).json({
-          message: "Send To Cart Success!",
+      if(qty > checkQty.stock){
+        res.status(200).json({
+          message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+          status: true,
+          stock: checkQty.stock
+        });
+      }else{
+        res.status(200).json({
+          message: "Berhasil Menambahkan ke Keranjang Anda, Silahkan Checkout!",
           status: true
         });        
+      }      
+
   } catch (error) {
       console.error(error.message);
       res.status(500).json({

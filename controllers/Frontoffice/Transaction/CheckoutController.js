@@ -76,6 +76,8 @@ const getTransaksi = asyncHandler(async (req, res) => {
                 td.deletedAt IS NULL 
                 AND t.tanggal_checkout IS NULL
                 AND t.user_ecommerce_id = :id
+            GROUP BY
+                t.id
             ORDER BY 
                 td.id;
         `;
@@ -203,12 +205,37 @@ const createCheckout = asyncHandler(async(req, res) => {
 
 const processCheckout = asyncHandler(async(req, res) => {
     try {
-        const { ekspedisi_id } = req.body;
+        const { ekspedisi_id, kota, kode_pos, alamat } = req.body;
         const user = await User_Ecommerces.findOne({
             where: { no_telepon: req.user.username }
         });
         let id = user.id;
         const formattedNoTelepon = user.no_telepon.startsWith('0') ? '62' + user.no_telepon.slice(1) : user.no_telepon;
+
+        const findCustomer = await M_Customers.findOne({
+            where: { user_ecommerce_id: user.id }
+        })
+
+        if(findCustomer == null){
+            await M_Customers.create({
+                user_ecommerce_id: id,
+                first_name: user.username,
+                no_telepon: user.no_telepon,
+                alamat: alamat,
+                kota: kota,
+                kode_pos: kode_pos
+            })
+        }else{
+            await M_Customers.update({
+                alamat: alamat,
+                kota: kota,
+                kode_pos: kode_pos
+            }, {
+                where: {
+                    user_ecommerce_id: user.id
+                }
+            })
+        }
 
         const customer = await M_Customers.findOne({
             where: { user_ecommerce_id: user.id }

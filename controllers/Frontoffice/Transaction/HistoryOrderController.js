@@ -31,12 +31,11 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 t.createdAt,
                 t.konfirmasi_admin,
                 td.product_id,
+                td.total_harga,
                 td.qty,
+                td.ukuran,
+                td.warna,
                 v.variasi AS 'variasi',
-                vpd.warna AS 'warna',
-                vpd.ukuran AS 'ukuran',
-                vpd.lain_lain AS 'lain_lain',
-                vpd.harga AS 'harga',
                 ue.name,
                 c.alamat,
                 me.ekspedisi
@@ -54,8 +53,6 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
                 m_customers as c ON c.user_ecommerce_id = t.user_ecommerce_id
             LEFT JOIN 
                 M_Variations as v ON td.variation_id = v.id AND v.deletedAt IS NULL
-            LEFT JOIN 
-                M_Variant_Product_Details as vpd ON v.id = vpd.variation_id AND vpd.deletedAt IS NULL AND p.id = vpd.product_id AND vpd.deletedAt IS NULL
             WHERE 
                 td.deletedAt IS NULL 
                 AND t.tanggal_checkout IS NOT NULL
