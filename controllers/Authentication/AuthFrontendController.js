@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { User_Ecommerces, user_confirm_otp } = require("../../models/");
+const { User_Ecommerces, user_confirm_otp, M_Customers } = require("../../models/");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
@@ -17,14 +17,26 @@ const registerUser = asyncHandler(async (req, res) => {
 
         const formattedNoTelepon = no_telepon.startsWith('0') ? '62' + no_telepon.slice(1) : no_telepon;
 
-        let checkUser = await User_Ecommerces.findOne({
+        let checkUserEmail = await User_Ecommerces.findOne({
           where: {
-            email: email,
+            email: email
+          }
+        })
+
+        if(checkUserEmail){
+          res.status(200).json({
+            message: "Anda sudah terdaftar!",
+            status: false
+          });
+        }
+
+        let checkUserTelepon = await User_Ecommerces.findOne({
+          where: {
             no_telepon: formattedNoTelepon
           }
         })
 
-        if(checkUser){
+        if(checkUserTelepon){
           res.status(200).json({
             message: "Anda sudah terdaftar!",
             status: false
@@ -41,6 +53,20 @@ const registerUser = asyncHandler(async (req, res) => {
         }
     
         const user = await User_Ecommerces.create(createUser);
+
+        const customerData = {
+          user_ecommerce_id: user.id,
+          first_name: name,
+          last_name: '',
+          no_telepon: formattedNoTelepon,
+          alamat: '-',
+          kota: '-',
+          kode_pos: '-',
+          jenis_kelamin: '-',
+          foto_profil: "default.png",
+        };
+
+        const customer = await M_Customers.create(customerData)
     
         const createOtp = Math.floor(100000 + Math.random() * 900000).toString();
 

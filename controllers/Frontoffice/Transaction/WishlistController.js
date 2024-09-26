@@ -192,8 +192,6 @@ const getWishlist = asyncHandler(async (req, res) => {
       replacements: { id },
       type: sequelize.QueryTypes.SELECT
     });
-    console.log('wishlists')
-    console.log(wishlists)
 
     res.status(200).json({
       message: "Get Data Success!",
