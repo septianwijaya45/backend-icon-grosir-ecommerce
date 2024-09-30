@@ -298,6 +298,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       foto,
       image,
       video,
+      varian_detail_id
     } = req.body;
 
     const dataProduct = {
@@ -387,7 +388,6 @@ const updateProduct = asyncHandler(async (req, res) => {
             });
           });
         } else {
-          console.log('masuk sana')
           await M_Variation_Products.create({
             variation_id: getVarian.id,
             product_id: product.id,
@@ -440,13 +440,16 @@ const updateProduct = asyncHandler(async (req, res) => {
             });            
           }
 
-          if(foto[i] != null && foto[i] != ''){
-            await M_Photo_Products.create({
-              product_id: product.id,
-              varian_product_detail_id: getVarianProductDetail.id,
-              nama_file: foto[i],
-            });
-          }
+          varian_detail_id.forEach(async (id) => {
+            if (foto['foto-' + id] != null && foto['foto-' + id] != '') {
+              await M_Photo_Products.create({
+                product_id: product.id,
+                varian_product_detail_id: getVarianProductDetail.id,
+                nama_file: foto['foto-' + id],
+              });
+            }
+          });
+          
         }
       }
     }
