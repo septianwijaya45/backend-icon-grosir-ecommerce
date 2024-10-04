@@ -108,7 +108,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     
     const totalPages = Math.ceil(products.rows.length / limit);
     
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Products Success!",
       data: products.rows,
       pagination: {
@@ -119,7 +119,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching products:', error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -175,13 +175,13 @@ const getTopViewProduct = asyncHandler(async (req, res) => {
       limit: 3,
     });    
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Top View Success!",
       data: topViewedProducts,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -245,13 +245,13 @@ const getProductByCategories = asyncHandler(async (req, res) => {
         limit: 8,
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         message: "Get 8 Product Success!",
         data: products,
       });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -312,13 +312,13 @@ const getProductByPopular= asyncHandler(async(req, res) => {
       ],
       limit: 4,
     });
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: products,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
@@ -333,7 +333,7 @@ const getProductByFeatured = asyncHandler(async(req, res) => {
     order: [["view_product", "DESC"]],
     limit: 4
   });
-  res.status(200).json({
+  return res.status(200).json({
     message: "Get Data Success!",
     data: products,
   });
@@ -348,13 +348,13 @@ const getProductByLatest = asyncHandler(async (req, res) => {
       order: [["createdAt", "DESC"]],
       limit: 4
     });
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: products,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
@@ -477,7 +477,7 @@ const getProductById = asyncHandler(async (req, res) => {
       ],
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Detail Product Success!",
       product: product,
       productDetail: productDetail,
@@ -487,7 +487,7 @@ const getProductById = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -509,11 +509,11 @@ const getVarianById = asyncHandler(async (req, res) => {
       group: ['variasi_detail']
     })
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
     
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -547,10 +547,10 @@ const getWarnaById = asyncHandler(async(req, res) => {
       attributes: ['warna']
     })
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -585,10 +585,10 @@ const getUkuranById = asyncHandler(async(req, res) => {
       attributes: ['ukuran']
     })
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -637,10 +637,10 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     })
     
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -669,10 +669,10 @@ const getWarnaProduct = asyncHandler(async(req, res) => {
     
     console.log(variantBarangDetails)
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -698,10 +698,10 @@ const getUkuranProduct = asyncHandler(async(req, res) => {
     })
     
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -727,10 +727,10 @@ const getHargaProduct = asyncHandler(async(req, res) => {
       attributes: ['harga']
     })
     
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });

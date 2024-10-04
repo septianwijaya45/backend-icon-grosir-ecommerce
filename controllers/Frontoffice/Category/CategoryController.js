@@ -12,13 +12,13 @@ const getAllCategory = asyncHandler(async (req, res) => {
       where: {deletedAt: null}
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: category,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -35,13 +35,13 @@ const getFiveCategory = asyncHandler(async (req, res) => {
       limit: 5,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get 5 Categories Success!",
       data: categories,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -75,13 +75,13 @@ const getTreeCategory = asyncHandler(async (req, res) => {
       limit: 3,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get 3 Categories Success!",
       data: categories,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

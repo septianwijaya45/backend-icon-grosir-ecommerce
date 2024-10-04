@@ -14,13 +14,13 @@ const getAllCustomer = asyncHandler(async (req, res) => {
           ],
         });
 
-        res.status(201).json({
+        return res.status(201).json({
           message: "Get Data Success!",
           data: getDataCustomer,
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
     }
@@ -45,7 +45,7 @@ const createCustomer = asyncHandler(async (req, res) => {
         const emailExists = await User_Ecommerces.findOne({ where: { email : email } });
 
         if (emailExists) {
-          res.status(500).json({
+          return res.status(500).json({
             status: false,
             message: "Email Sudah Terdaftar",
           });
@@ -76,13 +76,13 @@ const createCustomer = asyncHandler(async (req, res) => {
 
         const customer = await M_Customers.create(customerData)
 
-        res.status(201).json({
+        return res.status(201).json({
           message: "Success When Insert Data!",
           data: { user, customer },
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
     }
@@ -106,17 +106,17 @@ const getCustomerById = asyncHandler(async (req, res) => {
         });
 
         if (!customerDetail) {
-          res.status(500).json({
+          return res.status(500).json({
             message: "Data Tidak Ditemukan!",
           });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
           data: customerDetail,
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
     }
@@ -176,12 +176,12 @@ const updateCustomer = asyncHandler( async (req, res) => {
           });
 
 
-        res.status(200).json({
+        return res.status(200).json({
           message: "Data Berhasil Diupdate!",
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
     }
@@ -194,7 +194,7 @@ const deleteCustomer = asyncHandler(async (req, res) => {
     let user = await User_Ecommerces.findOne({ uuid: uuid });
 
     if (!user) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -207,12 +207,12 @@ const deleteCustomer = asyncHandler(async (req, res) => {
     }
     await user.destroy();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Data Berhasil Dihapus!",
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

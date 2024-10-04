@@ -16,13 +16,13 @@ const getAllDiscountProduct = asyncHandler(async (req, res) => {
       ],
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: discountProduct,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -41,13 +41,13 @@ const createDiscountProduct = asyncHandler(async (req, res) => {
       end_Date: end_date,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Create Data Success!",
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -61,17 +61,17 @@ const getDiscountProductById = asyncHandler(async (req, res) => {
     });
 
     if (!discountProduct) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       data: discountProduct,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -88,7 +88,7 @@ const updateDiscountProduct = asyncHandler(async (req, res) => {
     });
 
     if (!checkDiscountProduct) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -110,13 +110,13 @@ const updateDiscountProduct = asyncHandler(async (req, res) => {
 
     let newData = await M_Discount_Products.findOne({ where: { id: id } });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Update Data ${checkDiscountProduct.category} Success!`,
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -130,7 +130,7 @@ const deleteDiscountProduct = asyncHandler(async (req, res) => {
     });
 
     if (!checkDiscountProduct) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -141,12 +141,12 @@ const deleteDiscountProduct = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Delete Data ${checkDiscountProduct.category} Success!`,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

@@ -5,13 +5,13 @@ const getAllCategory = asyncHandler(async (req, res) => {
   try {
     const category = await M_Categories.findAll();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: category,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -25,13 +25,13 @@ const createCategory = asyncHandler(async (req, res) => {
       category: category,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Create Data Success!",
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -43,17 +43,17 @@ const getCategoryById = asyncHandler(async (req, res) => {
     const category = await M_Categories.findOne({ where: { id: id } });
 
     if (!category) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       data: category,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -67,7 +67,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     const checkCategory = await M_Categories.findOne({ where: { id: id } });
 
     if (!checkCategory) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -85,13 +85,13 @@ const updateCategory = asyncHandler(async (req, res) => {
 
     let newData = await M_Categories.findOne({ where: { id: id } });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Update Data ${checkCategory.category} Success!`,
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -103,7 +103,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
     const checkCategory = await M_Categories.findOne({ where: { id: id } });
 
     if (!checkCategory) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -114,12 +114,12 @@ const deleteCategory = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Delete Data ${checkCategory.category} Success!`,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

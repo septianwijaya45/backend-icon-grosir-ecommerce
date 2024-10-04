@@ -61,13 +61,13 @@ const getMyOrder = asyncHandler(async(req, res) => {
             type: sequelize.QueryTypes.SELECT
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Get Data Success!",
             data: transactions,
         });
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });

@@ -43,14 +43,14 @@ const getTransaksi = asyncHandler(async (req, res) => {
             type: sequelize.QueryTypes.SELECT
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Get Data Success!",
             data: transactions,
         });
 
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });
@@ -70,7 +70,7 @@ const detailTransaksi = asyncHandler(async(req, res) => {
         });
 
         if(!transactions){
-            res.status(404).json({
+            return res.status(404).json({
                 status: false,
                 message: "Data Transaksi "+kode_invoice+" Tidak Ada! Mungkin Telah Terhapus",
             });
@@ -149,7 +149,7 @@ const detailTransaksi = asyncHandler(async(req, res) => {
             type: sequelize.QueryTypes.SELECT
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Get Data Success!",
             personalData: personalData[0],
             dataDetails: dataTransaction,
@@ -157,7 +157,7 @@ const detailTransaksi = asyncHandler(async(req, res) => {
 
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });
@@ -176,7 +176,7 @@ const confirmData = asyncHandler(async(req, res) => {
         });
 
         if(!transactions){
-            res.status(404).json({
+            return res.status(404).json({
                 status: false,
                 message: "Data Transaksi "+kode_invoice+" Tidak Ada! Mungkin Telah Terhapus",
             });
@@ -192,13 +192,13 @@ const confirmData = asyncHandler(async(req, res) => {
             }
         );
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Anda berhasil konfirmasi pesanan",
             status: true,
         });
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });

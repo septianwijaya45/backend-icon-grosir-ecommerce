@@ -122,13 +122,13 @@ const createWishlist = asyncHandler(async (req, res) => {
           );
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Send To Wishlist Success!",
             status: true,
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal Server Error! Please Contact Developer",
             status: false,
         });
@@ -193,13 +193,13 @@ const getWishlist = asyncHandler(async (req, res) => {
       type: sequelize.QueryTypes.SELECT
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: wishlists,
     });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -249,7 +249,7 @@ const updateQtyWishlist = asyncHandler(async (req, res) => {
         }
       })
 
-      res.status(200).json({
+      return res.status(200).json({
           message: `Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
           status: false,
           stock: checkQty.stock
@@ -267,7 +267,7 @@ const updateQtyWishlist = asyncHandler(async (req, res) => {
         }
       })
       
-      res.status(200).json({
+      return res.status(200).json({
           message: "Update Wishlist Success!",
           status: true,
       });
@@ -276,7 +276,7 @@ const updateQtyWishlist = asyncHandler(async (req, res) => {
 
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -293,7 +293,7 @@ const deleteWishlist = asyncHandler(async (req, res) => {
     });
 
     if(!wishlistDetail){
-      res.status(200).json({
+      return res.status(200).json({
         message: "Hapus Data Gagal! Data Sudah Terhapus!",
         status: false
       });
@@ -314,13 +314,13 @@ const deleteWishlist = asyncHandler(async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Delete Data Success!",
       status: true
     });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -404,14 +404,14 @@ const createWishlistByProductDetail = asyncHandler(async (req, res) => {
       );
     }
 
-    res.status(200).json({
+    return res.status(200).json({
         message: "Send To Wishlist Success!",
         status: true,
     });
     
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });

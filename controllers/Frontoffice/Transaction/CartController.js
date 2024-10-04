@@ -67,13 +67,13 @@ const getCart = asyncHandler(async (req, res) => {
             type: sequelize.QueryTypes.SELECT
         });
       
-        res.status(200).json({
+        return res.status(200).json({
             message: "Get Data Success!",
             data: carts,
         });
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });
@@ -141,6 +141,21 @@ const createCart = asyncHandler(async (req, res) => {
             where: {user_ecommerce_id: user.id}
         })
 
+        let checkQty = await T_Stocks.findOne({
+          where: {
+            product_id: product.id,
+            variation_id: product['M_Variations'][0]['id'],
+          },
+          attributes: ['stock']
+        })
+
+        if(checkQty.stock <= 0){
+          return res.status(200).json({
+            message: `Stok Pada Produk ${product.artikel} Habis!`,
+            status: false
+          });
+        }
+
         if(!checkCart){
             const cart = await T_Carts.create({
                 user_ecommerce_id: user.id,
@@ -164,13 +179,13 @@ const createCart = asyncHandler(async (req, res) => {
         }
 
 
-        res.status(200).json({
-            message: "Send To Cart Success!",
-            status: true
-          });        
+        return res.status(200).json({
+          message: "Send To Cart Success!",
+          status: true
+        });        
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
       }
@@ -199,6 +214,16 @@ const createWishlistCart = asyncHandler(async (req, res) => {
 
         const checkCart = await T_Carts.findOne({
             where: {user_ecommerce_id: user.id}
+        })
+
+        let checkQty = await T_Stocks.findOne({
+          where: {
+            product_id: product.id,
+            variation_id: checkWishlistDetail.variant_id,
+            warna: checkWishlistDetail.warna,
+            ukuran: checkWishlistDetail.ukuran
+          },
+          attributes: ['stock']
         })
 
         if(!checkCart){
@@ -245,13 +270,21 @@ const createWishlistCart = asyncHandler(async (req, res) => {
             });
         }
 
-        res.status(200).json({
-            message: "Send To Cart Success!",
+        if(checkWishlistDetail.qty > checkQty.stock){
+          return res.status(200).json({
+            message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+            status: true,
+            stock: checkQty.stock
+          });
+        }else{
+          return res.status(200).json({
+            message: "Berhasil Menambahkan ke Keranjang Anda, Silahkan Checkout!",
             status: true
-          }); 
+          });        
+        }  
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
         });
       }
@@ -345,7 +378,7 @@ const updateCart = asyncHandler(async (req, res) => {
             totalHarga += detail.price * detail.qty;
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Berhasil menambahkan qty!",
             status: true,
             totalHarga: totalHarga,
@@ -353,7 +386,7 @@ const updateCart = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching cart:", error);
-        res.status(500).json({
+        return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
           status: false,
         });
@@ -370,7 +403,7 @@ const deleteCart = asyncHandler(async (req, res) => {
       });
   
       if(!CartDetail){
-        res.status(200).json({
+        return res.status(200).json({
           message: "Hapus Data Gagal! Data Sudah Terhapus!",
           status: false
         });
@@ -391,13 +424,13 @@ const deleteCart = asyncHandler(async (req, res) => {
         });
       }
   
-      res.status(200).json({
+      return res.status(200).json({
         message: "Delete Data Success!",
         status: true
       });
     } catch (error) {
       console.error("Error fetching cart:", error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal Server Error! Please Contact Developer",
         status: false,
       });
@@ -420,11 +453,11 @@ const getVarianById = asyncHandler(async (req, res) => {
         group: ['variasi_detail']
       })
   
-      res.status(200).json(variantBarangDetails);
+      return res.status(200).json(variantBarangDetails);
       
     } catch (error) {
       console.error("Error fetching wishlists:", error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal Server Error! Please Contact Developer",
         status: false,
       });
@@ -457,10 +490,10 @@ const getWarnaById = asyncHandler(async(req, res) => {
       attributes: ['warna']
     })
 
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -494,19 +527,11 @@ const getUkuranById = asyncHandler(async(req, res) => {
       },
       attributes: ['ukuran']
     })
-    console.log(productDetail.id)
-    console.log(variant_id);
-    console.log(warna);
     
-    
-    console.log('ukuranku')
-    console.log(variantBarangDetails);
-    
-
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -555,10 +580,10 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     })
     
-    res.status(200).json(variantBarangDetails);
+    return res.status(200).json(variantBarangDetails);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -618,13 +643,13 @@ const duplicateProduct = asyncHandler(async (req, res) => {
     //   attributes: ['warna']
     // })
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Duplicate Product Cart Success!",
       status: true,
       product: getDuplicateProduct,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
       status: false,
     });
@@ -698,13 +723,13 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
       }
 
       if(qty > checkQty.stock){
-        res.status(200).json({
+        return res.status(200).json({
           message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
           status: true,
           stock: checkQty.stock
         });
       }else{
-        res.status(200).json({
+        return res.status(200).json({
           message: "Berhasil Menambahkan ke Keranjang Anda, Silahkan Checkout!",
           status: true
         });        
@@ -712,7 +737,7 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
 
   } catch (error) {
       console.error(error.message);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Internal Server Error! Please Contact Developer",
       });
     }

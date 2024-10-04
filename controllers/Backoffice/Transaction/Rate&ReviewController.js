@@ -22,13 +22,13 @@ const getAllRateReviews = asyncHandler(async (req, res) => {
       ],
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Get Data Success!",
       data: getDataRateReviews,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -56,13 +56,13 @@ const createRateReviews = asyncHandler(async (req, res) => {
 
     const rateViewInsert = await T_Rate_And_Reviews.create(dataReview);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Success When Insert Data!",
       data: rateViewInsert,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -95,17 +95,17 @@ const getRateReviewById = asyncHandler(async (req, res) => {
     );
 
     if (!getDataRateReviews) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       data: getDataRateReviews,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -137,7 +137,7 @@ const updateRateReview = asyncHandler(async (req, res) => {
     });
 
     if (!checkRateReview) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -153,7 +153,7 @@ const updateRateReview = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -167,7 +167,7 @@ const deleteRateReview = asyncHandler(async (req, res) => {
     });
 
     if (!checkRateReview) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -178,12 +178,12 @@ const deleteRateReview = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Delete Data Success!`,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

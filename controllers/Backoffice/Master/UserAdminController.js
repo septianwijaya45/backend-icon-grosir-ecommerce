@@ -14,13 +14,13 @@ const getAllAdminUser = asyncHandler(async (req, res) => {
       ],
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Get Data Success!",
       data: getDataUser,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -42,7 +42,7 @@ const createAdminUser = asyncHandler(async (req, res) => {
     const userExists = await Users.findOne({ where: { email: email } });
 
     if (userExists) {
-      res.status(404);
+      return res.status(404);
       throw new Error("User Already Exists");
     }
 
@@ -66,13 +66,13 @@ const createAdminUser = asyncHandler(async (req, res) => {
     };
     const admin = await M_Admins.create(adminData);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Success When Insert Data!",
       data: { user, admin },
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -93,17 +93,17 @@ const getAdminUserById = asyncHandler(async (req, res) => {
     });
 
     if (!dataAdminUser) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       data: dataAdminUser,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -126,7 +126,7 @@ const updateAdminUser = asyncHandler(async (req, res) => {
     let dataAdminUser = await Users.findOne({ uuid: uuid });
 
     if (!dataAdminUser) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -162,12 +162,12 @@ const updateAdminUser = asyncHandler(async (req, res) => {
         console.error("Error updating data:", error);
       });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Data Berhasil Diupdate!",
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -180,7 +180,7 @@ const deleteAdminUser = asyncHandler(async (req, res) => {
     let user = await Users.findOne({ uuid: uuid });
 
     if (!user) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -191,12 +191,12 @@ const deleteAdminUser = asyncHandler(async (req, res) => {
     }
     await user.destroy();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Data Berhasil Dihapus!",
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

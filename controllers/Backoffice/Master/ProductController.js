@@ -39,13 +39,13 @@ const getAllProduct = asyncHandler(async (req, res) => {
         type: sequelize.QueryTypes.SELECT
     });
     
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: products,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -93,13 +93,13 @@ const createProduct = asyncHandler(async (req, res) => {
     })
 
     if(checkProduct){
-      res.status(200).json({
+      return res.status(500).json({
         status: false,
-        message: "Berhasil Menyimpan Data!"
+        message: "Produk Sudah Tersedia Di Database!"
       });
     }
-
     const product = await M_Products.create(dataProduct);
+
 
     if (varian.length != 0) {
       for (let i = 0; i < varian.length; i++) {
@@ -163,14 +163,14 @@ const createProduct = asyncHandler(async (req, res) => {
     }
 
 
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
       message: "Berhasil Menyimpan Data!",
       data: product,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -260,7 +260,7 @@ const getProductById = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: product,
       stock: stock,
@@ -268,7 +268,7 @@ const getProductById = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -487,13 +487,13 @@ const updateProduct = asyncHandler(async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Update Data Success!",
       data: product,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -515,13 +515,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Delete Data Success!",
       status: true,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
@@ -645,13 +645,13 @@ const syncProduct = asyncHandler(async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Sync Data Success!",
       status: true,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });

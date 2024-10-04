@@ -24,7 +24,7 @@ const registerUser = asyncHandler(async (req, res) => {
         })
 
         if(checkUserEmail){
-          res.status(200).json({
+          return res.status(200).json({
             message: "Anda sudah terdaftar!",
             status: false
           });
@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
         })
 
         if(checkUserTelepon){
-          res.status(200).json({
+          return res.status(200).json({
             message: "Anda sudah terdaftar!",
             status: false
           });
@@ -88,7 +88,7 @@ const registerUser = asyncHandler(async (req, res) => {
         
         // const result = await response.json();
         
-        res.status(200).json({
+        return res.status(200).json({
             message: "Data Success Registered!",
             status: true,
             user:user,
@@ -96,7 +96,7 @@ const registerUser = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({
+        return res.status(500).json({
             status: false,
             message: "Internal Server Error! Please Contact Developer",
         });
@@ -129,14 +129,14 @@ const getConfirmOtp = asyncHandler(async (req, res) => {
         });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
         status: true,
         message: "Get Confirm OTP berhasil!",
         otp: otpData,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
@@ -203,14 +203,14 @@ const confirmOtp = asyncHandler(async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(200).json({
+      return res.status(200).json({
           status: true,
           message: "Verifikasi OTP berhasil!",
           accessToken: accessToken,
       });
   } catch (error) {
       console.error(error.message);
-      res.status(500).json({
+      return res.status(500).json({
           status: false,
           message: "Internal Server Error! Please Contact Developer",
       });
@@ -251,14 +251,14 @@ const resendOtp = asyncHandler(async (req, res) => {
     });
     */
 
-    res.status(200).json({
+    return res.status(200).json({
         status: true,
         message: "Resend OTP Berhasil!"
     });
 
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
         status: false,
         message: "Internal Server Error! Please Contact Developer",
     });
@@ -315,14 +315,14 @@ const loginUser = asyncHandler(async (req, res) => {
     });
     */
 
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
       message: "Berhasil Login!",
       user: user
     });
   } catch (error) {
     console.error(error); // Menampilkan kesalahan di konsol server
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Internal Server Error! Please Contact Developer",
     });
@@ -344,7 +344,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       res.json({ accessToken });
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -356,7 +356,7 @@ const logout = asyncHandler(async (req, res) => {
     res.clearCookie("refreshToken");
     res.json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

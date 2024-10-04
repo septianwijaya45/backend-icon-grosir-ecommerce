@@ -48,14 +48,14 @@ const loginUser = asyncHandler(async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Berhasil Login!",
       accessToken: accessToken,
     });
   } catch (error) {
     console.error(error); // Menampilkan kesalahan di konsol server
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error,
       message: "Internal Server Error! Please Contact Developer",
@@ -79,7 +79,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       res.json({ accessToken });
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -91,7 +91,7 @@ const logout = asyncHandler(async (req, res) => {
     res.clearCookie("refreshToken");
     res.json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }

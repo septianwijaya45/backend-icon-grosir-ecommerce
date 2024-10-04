@@ -5,13 +5,13 @@ const getAllVariation = asyncHandler(async (req, res) => {
   try {
     const variants = await M_Variations.findAll();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: variants,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -25,13 +25,13 @@ const createVariation = asyncHandler(async (req, res) => {
       variasi: variant,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Create Data Success!",
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -43,17 +43,17 @@ const getVariationById = asyncHandler(async (req, res) => {
     const variant = await M_Variations.findOne({ where: { id: id } });
 
     if (!variant) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       data: variant,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -67,7 +67,7 @@ const updateVariation = asyncHandler(async (req, res) => {
     const checkVariant = await M_Variations.findOne({ where: { id: id } });
 
     if (!checkVariant) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -85,13 +85,13 @@ const updateVariation = asyncHandler(async (req, res) => {
 
     let newData = await M_Variations.findOne({ where: { id: id } });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Update Data ${checkVariant.variasi} Success!`,
       data: newData,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -103,7 +103,7 @@ const deleteVariation = asyncHandler(async (req, res) => {
     const checkVariant = await M_Variations.findOne({ where: { id: id } });
 
     if (!checkVariant) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -114,12 +114,12 @@ const deleteVariation = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Delete Data ${checkVariant.variasi} Success!`,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
@@ -137,13 +137,13 @@ const getVariationDetails = asyncHandler(async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Get Data Success!",
       data: variationDetails,
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal Server Error! Please Contact Developer",
     });
   }
