@@ -237,7 +237,7 @@ const createWishlistCart = asyncHandler(async (req, res) => {
                 product_id: checkWishlistDetail.product_id,
                 variant_id: checkWishlistDetail.variant_id,
                 price: product.harga,
-                qty: checkWishlistDetail.qty,
+                qty: (checkWishlistDetail.qty > checkQty.stock) ? checkQty.stock : checkWishlistDetail.qty,
                 varian: checkWishlistDetail.varian,
                 warna: checkWishlistDetail.warna,
                 ukuran: checkWishlistDetail.ukuran,
@@ -248,7 +248,7 @@ const createWishlistCart = asyncHandler(async (req, res) => {
                 product_id: checkWishlistDetail.product_id,
                 variant_id: checkWishlistDetail.variant_id,
                 price: product.harga,
-                qty: checkWishlistDetail.qty,
+                qty: (checkWishlistDetail.qty > checkQty.stock) ? checkQty.stock : checkWishlistDetail.qty,
                 varian: checkWishlistDetail.varian,
                 warna: checkWishlistDetail.warna,
                 ukuran: checkWishlistDetail.ukuran,
@@ -350,6 +350,10 @@ const updateCart = asyncHandler(async (req, res) => {
           },
           attributes: ['stock']
         })
+        console.log(product.id)
+        console.log(updateDetail.variant_id)
+        console.log(updateDetail.warna)
+        console.log(updateDetail.ukuran)
 
         let newQty = parseInt(qty, 10);
         if(newQty > checkQty.stock){
@@ -378,12 +382,21 @@ const updateCart = asyncHandler(async (req, res) => {
             totalHarga += detail.price * detail.qty;
         }
 
-        return res.status(200).json({
-            message: "Berhasil menambahkan qty!",
+        if(qty > checkQty.stock){
+          return res.status(200).json({
+            message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${newQty}!`,
             status: true,
             totalHarga: totalHarga,
             newQty: newQty
-        });
+          });
+        }else{
+          return res.status(200).json({
+            message: "Berhasil Menambahkan ke Keranjang Anda, Silahkan Checkout!",
+            status: true,
+            totalHarga: totalHarga,
+            newQty: newQty
+          });        
+        } 
     } catch (error) {
         console.error("Error fetching cart:", error);
         return res.status(500).json({
@@ -547,7 +560,7 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     })
 
-    await T_Wishlist_Details.update({
+    await T_Cart_Details.update({
       ukuran: ukuran,
     }, {
       where: {

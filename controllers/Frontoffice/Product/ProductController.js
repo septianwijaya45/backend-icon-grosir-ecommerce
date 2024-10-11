@@ -129,6 +129,9 @@ const getAllProduct = asyncHandler(async (req, res) => {
 const getTopViewProduct = asyncHandler(async (req, res) => {
   try {
     const topViewedProducts = await M_Products.findAll({
+      where: {
+        status_barang: 1,
+      },
       include: [
         {
           model: M_Variations,
@@ -170,10 +173,18 @@ const getTopViewProduct = asyncHandler(async (req, res) => {
           },
           required: false,
         },
+        {
+          model: T_Stocks,
+          as: "T_Stocks",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
       ],
       order: [['view_product', 'DESC']],
       limit: 3,
-    });    
+    });
 
     return res.status(200).json({
       message: "Get Top View Success!",
@@ -189,6 +200,7 @@ const getTopViewProduct = asyncHandler(async (req, res) => {
 
 const getProductByCategories = asyncHandler(async (req, res) => {
   try {
+    console.log('masuk kategori')
     const { categoryId } = req.params;
     const category = await M_Categories.findOne({
         where: {
@@ -199,6 +211,7 @@ const getProductByCategories = asyncHandler(async (req, res) => {
       const products = await M_Products.findAll({
         where: {
           category_id: category.id,
+          status_barang: 1
         },
         include: [
           {
@@ -241,8 +254,18 @@ const getProductByCategories = asyncHandler(async (req, res) => {
             },
             required: false,
           },
+          {
+            model: T_Stocks,
+            as: "T_Stocks",
+            where: {
+              deletedAt: null,
+            },
+            required: false,
+          },
         ],
+        group: ['M_Products.id'],
         limit: 8,
+        distinct: true
       });
 
       return res.status(200).json({
@@ -260,6 +283,9 @@ const getProductByCategories = asyncHandler(async (req, res) => {
 const getProductByPopular= asyncHandler(async(req, res) => {
   try {
     const products = await M_Products.findAll({
+      where: {
+        status_barang: 1,
+      },
       include: [
         {
           model: M_Variations,
@@ -309,6 +335,14 @@ const getProductByPopular= asyncHandler(async(req, res) => {
           order: [[sequelize.literal("COUNT(*)"), "DESC"]],
           required: true,
         },
+        {
+          model: T_Stocks,
+          as: "T_Stocks",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
       ],
       limit: 4,
     });
@@ -329,8 +363,20 @@ const getProductByFeatured = asyncHandler(async(req, res) => {
   let products = await M_Products.findAll({
     where: {
       deletedAt: null,
+      status_barang: 1
     },
+    include: [
+      {
+        model: T_Stocks,
+        as: "T_Stocks",
+        where: {
+          deletedAt: null,
+        },
+        required: false,
+      },
+    ],
     order: [["view_product", "DESC"]],
+    group: ['uuid'],
     limit: 4
   });
   return res.status(200).json({
@@ -344,8 +390,20 @@ const getProductByLatest = asyncHandler(async (req, res) => {
     let products = await M_Products.findAll({
       where: {
         deletedAt: null,
+        status_barang: 1
       },
+      include: [
+        {
+          model: T_Stocks,
+          as: "T_Stocks",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
+      ],
       order: [["createdAt", "DESC"]],
+      group: ['uuid'],
       limit: 4
     });
     return res.status(200).json({
@@ -406,6 +464,14 @@ const getProductById = asyncHandler(async (req, res) => {
         {
           model: M_Photo_Products,
           as: "photos",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
+        {
+          model: T_Stocks,
+          as: "T_Stocks",
           where: {
             deletedAt: null,
           },
@@ -724,10 +790,23 @@ const getHargaProduct = asyncHandler(async(req, res) => {
         warna: warna,
         ukuran: ukuran
       },
-      attributes: ['harga']
+      attributes: ['harga', 'variation_id']
     })
+
+    const stock = await T_Stocks.findOne({
+      where: {
+        product_id: productDetail.id,
+        warna: warna,
+        variation_id: variantBarangDetails.variation_id,
+        ukuran: ukuran
+      },
+      attributes: ['stock']
+    });
     
-    return res.status(200).json(variantBarangDetails);
+    return res.status(200).json({
+      'dataVarian': variantBarangDetails,
+      'stock'     : stock
+    });
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     return res.status(500).json({
