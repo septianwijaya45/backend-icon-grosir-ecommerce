@@ -124,7 +124,7 @@ const detailTransaksi = asyncHandler(async(req, res) => {
                 vpd.warna AS 'warna',
                 vpd.ukuran AS 'ukuran',
                 vpd.lain_lain AS 'lain_lain',
-                vpd.harga AS 'harga'
+                td.total_harga AS 'harga'
             FROM 
                 T_Transaksies as t
             INNER JOIN 
@@ -140,6 +140,8 @@ const detailTransaksi = asyncHandler(async(req, res) => {
                 AND t.tanggal_checkout IS NOT NULL
                 AND t.user_ecommerce_id = :id
                 AND t.kode_invoice = :kode_invoice
+            GROUP BY
+                p.uuid
             ORDER BY 
                 td.id;
         `;

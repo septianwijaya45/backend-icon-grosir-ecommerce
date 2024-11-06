@@ -14,7 +14,9 @@ const {
   T_Stocks,
   T_Rate_And_Reviews,
   User_Ecommerces,
-  T_Wishlist_Details
+  T_Wishlist_Details,
+  M_Discount_Categories,
+  M_Discount_Products
 } = require("../../../models/");
 
 const getAllProduct = asyncHandler(async (req, res) => {
@@ -64,6 +66,14 @@ const getAllProduct = asyncHandler(async (req, res) => {
         {
           model: M_Photo_Products,
           as: "photos",
+          where: {
+            deletedAt: null,
+          },
+          required: false,
+        },
+        {
+          model: T_Stocks,
+          as: "T_Stocks",
           where: {
             deletedAt: null,
           },
@@ -263,7 +273,7 @@ const getProductByCategories = asyncHandler(async (req, res) => {
             required: false,
           },
         ],
-        group: ['M_Products.id'],
+        group: ['M_Products.artikel'],
         limit: 8,
         distinct: true
       });
@@ -664,6 +674,8 @@ const getUkuranById = asyncHandler(async(req, res) => {
 const getHargaById = asyncHandler(async(req, res) => {
   try {
     const { product_id, variant_id,  warna, ukuran, wishlish} = req.params;
+    const currentDate = new Date();
+
     const productDetail = await M_Products.findOne({
       where: {
         uuid: product_id
@@ -691,8 +703,55 @@ const getHargaById = asyncHandler(async(req, res) => {
       attributes: ['harga']
     })
 
+    let hargaProduct = variantBarangDetails.harga;
+    const checkDiscountCategory = await M_Discount_Categories.findOne({
+      where: {
+        category_id: productDetail.category_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if(checkDiscountCategory){
+      if (checkDiscountCategory.diskon_persen != null && checkDiscountCategory.diskon_persen != 0) {
+        let discount = variantBarangDetails.harga * (checkDiscountCategory.diskon_persen / 100);
+        hargaProduct -= discount;
+      }
+      if (checkDiscountCategory.diskon_harga != null && checkDiscountCategory.diskon_harga != 0) {
+        hargaProduct -= checkDiscountCategory.diskon_harga;
+      }
+    }
+
+    const checkDiscountProduct = await M_Discount_Products.findOne({
+      where: {
+        product_id: productDetail.id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if (checkDiscountProduct) {
+      if (checkDiscountProduct.diskon_persen != null && checkDiscountProduct.diskon_persen != 0) {
+          let discount = variantBarangDetails.harga * (checkDiscountProduct.diskon_persen / 100);
+          hargaProduct -= discount;
+      }
+      if (checkDiscountProduct.diskon_harga != null && checkDiscountProduct.diskon_harga != 0) {
+          hargaProduct -= checkDiscountProduct.diskon_harga;
+      }
+    }
+
+    console.log('hargaProduct-test:'+hargaProduct)
+
     await T_Wishlist_Details.update({
-      price: variantBarangDetails.harga
+      price: hargaProduct
     }, {
       where: {
         id: wishlish,
@@ -703,7 +762,11 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     })
     
-    return res.status(200).json(variantBarangDetails);
+    let arrayData = {
+      harga: hargaProduct,
+      variant_id: variantBarangDetails.variation_id
+    }
+    return res.status(200).json(arrayData);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     return res.status(500).json({
@@ -777,6 +840,8 @@ const getUkuranProduct = asyncHandler(async(req, res) => {
 const getHargaProduct = asyncHandler(async(req, res) => {
   try {
     const { product_id, variant_id,  warna, ukuran, cart} = req.params;
+    const currentDate = new Date();
+
     const productDetail = await M_Products.findOne({
       where: {
         uuid: product_id
@@ -793,6 +858,51 @@ const getHargaProduct = asyncHandler(async(req, res) => {
       attributes: ['harga', 'variation_id']
     })
 
+    let hargaProduct = variantBarangDetails.harga;
+    const checkDiscountCategory = await M_Discount_Categories.findOne({
+      where: {
+        category_id: productDetail.category_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if(checkDiscountCategory){
+      if (checkDiscountCategory.diskon_persen != null && checkDiscountCategory.diskon_persen != 0) {
+        let discount = variantBarangDetails.harga * (checkDiscountCategory.diskon_persen / 100);
+        hargaProduct -= discount;
+      }
+      if (checkDiscountCategory.diskon_harga != null && checkDiscountCategory.diskon_harga != 0) {
+        hargaProduct -= checkDiscountCategory.diskon_harga;
+      }
+    }
+
+    const checkDiscountProduct = await M_Discount_Products.findOne({
+      where: {
+        product_id: productDetail.id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if (checkDiscountProduct) {
+      if (checkDiscountProduct.diskon_persen != null && checkDiscountProduct.diskon_persen != 0) {
+          let discount = productDetail.harga * (checkDiscountProduct.diskon_persen / 100);
+          hargaProduct -= discount;
+      }
+      if (checkDiscountProduct.diskon_harga != null && checkDiscountProduct.diskon_harga != 0) {
+          hargaProduct -= checkDiscountProduct.diskon_harga;
+      }
+    }
+
     const stock = await T_Stocks.findOne({
       where: {
         product_id: productDetail.id,
@@ -803,10 +913,85 @@ const getHargaProduct = asyncHandler(async(req, res) => {
       attributes: ['stock']
     });
     
+    let arrayData = {
+      harga: hargaProduct,
+      variant_id: variantBarangDetails.variation_id
+    }
     return res.status(200).json({
-      'dataVarian': variantBarangDetails,
+      'dataVarian': arrayData,
       'stock'     : stock
     });
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    return res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
+const getProductDiscountByCategory = asyncHandler(async(req, res) => {
+  try {
+    console.log('diskon category')
+    
+    const {category_id} = req.params;
+    const currentDate = new Date();
+
+    const checkDiscountCategory = await M_Discount_Categories.findOne({
+      where: {
+        category_id: category_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if (!checkDiscountCategory) {
+      return res.status(500).json({
+        status: false,
+        message: "Data Tidak Ditemukan!",
+      });
+    }
+
+    return res.status(200).json(checkDiscountCategory);
+  } catch (error) {
+    console.error("Error fetching wishlists:", error);
+    return res.status(500).json({
+      message: "Internal Server Error! Please Contact Developer",
+      status: false,
+    });
+  }
+})
+
+const getProductDiscountById = asyncHandler(async(req, res) => {
+  try {
+    const {product_id} = req.params;
+    const currentDate = new Date();
+
+    const checkDiscountProduct = await M_Discount_Products.findOne({
+      where: {
+        product_id: product_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+
+    if (!checkDiscountProduct) {
+      return res.status(500).json({
+        status: false,
+        message: "Data Tidak Ditemukan!",
+      });
+    }
+
+    return res.status(200).json(checkDiscountProduct);
   } catch (error) {
     console.error("Error fetching wishlists:", error);
     return res.status(500).json({
@@ -830,5 +1015,7 @@ module.exports = {
   getTopViewProduct,
   getWarnaProduct,
   getUkuranProduct,
-  getHargaProduct
+  getHargaProduct,
+  getProductDiscountByCategory,
+  getProductDiscountById
 };

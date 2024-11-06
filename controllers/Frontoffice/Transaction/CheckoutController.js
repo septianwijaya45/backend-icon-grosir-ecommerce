@@ -61,7 +61,7 @@ const getTransaksi = asyncHandler(async (req, res) => {
                 vpd.warna AS 'warna',
                 vpd.ukuran AS 'ukuran',
                 vpd.lain_lain AS 'lain_lain',
-                vpd.harga AS 'harga'
+                td.total_harga AS 'harga'
             FROM 
                 T_Transaksies as t
             INNER JOIN 

@@ -1,4 +1,4 @@
-const { getProductByCategories, getProductByFeatured, getProductByLatest, getProductByPopular, getProductById, getAllProduct, getVarianById, getWarnaById, getUkuranById, getHargaById, getTopViewProduct, getWarnaProduct, getUkuranProduct, getHargaProduct } = require("../../../controllers/Frontoffice/Product/ProductController");
+const { getProductByCategories, getProductByFeatured, getProductByLatest, getProductByPopular, getProductById, getAllProduct, getVarianById, getWarnaById, getUkuranById, getHargaById, getTopViewProduct, getWarnaProduct, getUkuranProduct, getHargaProduct, getProductDiscountByCategory, getProductDiscountById } = require("../../../controllers/Frontoffice/Product/ProductController");
 
 const router = require("express").Router();
 
@@ -18,4 +18,7 @@ router.route("/get-warna-product/:product_id/:variant_id/").get(getWarnaProduct)
 router.route("/get-ukuran-product/:product_id/:variant_id/:warna/").get(getUkuranProduct);
 router.route("/get-harga-product/:product_id/:variant_id/:warna/:ukuran/").get(getHargaProduct);
 
+// discount
+router.route("/get-discount-by-category/:category_id").get(getProductDiscountByCategory);
+router.route("/get-discount-by-product/:product_id").get(getProductDiscountById);
 module.exports = router;

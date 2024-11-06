@@ -12,7 +12,9 @@ const {
   M_Size_Products,
   T_Wishlists,
   T_Wishlist_Details,
-  T_Stocks
+  T_Stocks,
+  M_Discount_Categories,
+  M_Discount_Products
 } = require("../../../models/");
 const { v4: uuidv4 } = require("uuid");
 const { default: axios } = require("axios");
@@ -20,6 +22,7 @@ const { default: axios } = require("axios");
 const createWishlist = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;
+        const currentDate = new Date();
 
         const user = await User_Ecommerces.findOne({
           where: { no_telepon: req.user.username }
@@ -74,6 +77,51 @@ const createWishlist = asyncHandler(async (req, res) => {
             });
         }
 
+        let hargaProduct = product.harga;
+        const checkDiscountCategory = await M_Discount_Categories.findOne({
+          where: {
+            category_id: product.category_id,
+            start_date: {
+              [Op.lte]: currentDate
+            },
+            end_Date: {
+              [Op.gte]: currentDate
+            }
+          },
+        });
+
+        if(checkDiscountCategory){
+          if (checkDiscountCategory.diskon_persen != null && checkDiscountCategory.diskon_persen != 0) {
+            let discount = product.harga * (checkDiscountCategory.diskon_persen / 100);
+            hargaProduct -= discount;
+          }
+          if (checkDiscountCategory.diskon_harga != null && checkDiscountCategory.diskon_harga != 0) {
+            hargaProduct -= checkDiscountCategory.diskon_harga;
+          }
+        }
+
+        const checkDiscountProduct = await M_Discount_Products.findOne({
+          where: {
+            product_id: product.id,
+            start_date: {
+              [Op.lte]: currentDate
+            },
+            end_Date: {
+              [Op.gte]: currentDate
+            }
+          },
+        });
+
+        if (checkDiscountProduct) {
+          if (checkDiscountProduct.diskon_persen != null && checkDiscountProduct.diskon_persen != 0) {
+              let discount = product.harga * (checkDiscountProduct.diskon_persen / 100);
+              hargaProduct -= discount;
+          }
+          if (checkDiscountProduct.diskon_harga != null && checkDiscountProduct.diskon_harga != 0) {
+              hargaProduct -= checkDiscountProduct.diskon_harga;
+          }
+        }
+
         const variant_id = product.M_Variations.length > 0 ? product.M_Variations[0].id : null;
 
         const variantProductDetail = await M_Variant_Product_Detail.findOne({
@@ -92,6 +140,7 @@ const createWishlist = asyncHandler(async (req, res) => {
         });
 
         if (!wishlist) {
+          
             wishlist = await T_Wishlists.create({
                 user_ecommerce_id: user.id,
                 status: 0,
@@ -109,7 +158,7 @@ const createWishlist = asyncHandler(async (req, res) => {
                 wishlist_id: wishlist.id,
                 product_id: product.id,
                 variant_id: variant_id,
-                price: product.harga,
+                price: hargaProduct,
                 qty: 1,
                 varian: variantProductDetail ? variantProductDetail.variasi_detail : null,
                 warna: variantProductDetail ? variantProductDetail.warna : null,
@@ -183,7 +232,7 @@ const getWishlist = asyncHandler(async (req, res) => {
       ) as vpd ON wd.variant_id = vpd.variation_id AND p.id = vpd.product_id AND wd.ukuran = vpd.ukuran AND wd.warna = vpd.warna
       WHERE 
           wd.deletedAt IS NULL 
-          AND w.user_ecommerce_id = 1
+          AND w.user_ecommerce_id = :id
       ORDER BY 
           wd.id;
     `;
@@ -330,6 +379,7 @@ const deleteWishlist = asyncHandler(async (req, res) => {
 const createWishlistByProductDetail = asyncHandler(async (req, res) => {
   try {
     const { product_id, variant_id, warna, ukuran, qty } = req.params;
+    const currentDate = new Date();
 
     const user = await User_Ecommerces.findOne({
         where: { no_telepon: req.user.username }
@@ -382,12 +432,58 @@ const createWishlistByProductDetail = asyncHandler(async (req, res) => {
       attributes: ['id', 'qty'],
     });
 
+    
+    let hargaProduct = variantProductDetail.harga;
+    const checkDiscountCategory = await M_Discount_Categories.findOne({
+      where: {
+        category_id: category_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if(checkDiscountCategory){
+      if (checkDiscountCategory.diskon_persen != null && checkDiscountCategory.diskon_persen != 0) {
+        let discount = product.harga * (checkDiscountCategory.diskon_persen / 100);
+        hargaProduct -= discount;
+      }
+      if (checkDiscountCategory.diskon_harga != null && checkDiscountCategory.diskon_harga != 0) {
+        hargaProduct -= checkDiscountCategory.diskon_harga;
+      }
+    }
+
+    const checkDiscountProduct = await M_Discount_Products.findOne({
+      where: {
+        product_id: product_id,
+        start_date: {
+          [Op.lte]: currentDate
+        },
+        end_Date: {
+          [Op.gte]: currentDate
+        }
+      },
+    });
+
+    if (checkDiscountProduct) {
+      if (checkDiscountProduct.diskon_persen != null && checkDiscountProduct.diskon_persen != 0) {
+          let discount = product.harga * (checkDiscountProduct.diskon_persen / 100);
+          hargaProduct -= discount;
+      }
+      if (checkDiscountProduct.diskon_harga != null && checkDiscountProduct.diskon_harga != 0) {
+          hargaProduct -= checkDiscountProduct.diskon_harga;
+      }
+    }
+
     if (!checkWishlistDetail) {
         await T_Wishlist_Details.create({
             wishlist_id: wishlist.id,
             product_id: product.id,
             variant_id: variation.id,
-            price: variantProductDetail.harga,
+            price: hargaProduct,
             qty: qty,
             varian: variant_id,
             warna: warna,
