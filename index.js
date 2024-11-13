@@ -42,6 +42,7 @@ const banner = require("./routes/backend/BannerRoute");
 const setting = require("./routes/backend/SettingRoute");
 
 // Ecomomerce
+const resetUserEcommerce = require('./routes/frontend/Authentication/ResetRoute');
 const categoryHome = require('./routes/frontend/Home/CategoryRoute');
 const productHome = require('./routes/frontend/Home/ProductRoute');
 const bannerFrontend = require("./routes/frontend/Home/BannerRoute");
@@ -61,6 +62,7 @@ app.get('/', async (req, res) => {
 // authentication
 app.use("/api/auth", authUser);
 app.use("/api/auth-ecommerce", authUserEcommerce);
+app.use("/api/auth-ecommerce/reset", resetUserEcommerce);
 
 // master backoffice
 app.use("/api/admin", adminUser);
