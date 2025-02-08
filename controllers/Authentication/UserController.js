@@ -111,7 +111,11 @@ const resetPassword = asyncHandler(async (req, res) => {
     const { uuid } = req.params;
 
     let password = "admin123";
-    let user = await Users.findOne({ uuid: uuid });
+    let user = await Users.findOne({
+      where: {
+        uuid: uuid,
+      }
+    });
 
     if (!dataAdminUser) {
       return res.status(500).json({
@@ -119,7 +123,11 @@ const resetPassword = asyncHandler(async (req, res) => {
       });
     }
 
-    await Users.findOne({ uuid: uuid })
+    await Users.findOne({
+      where: {
+        uuid: uuid,
+      }
+    })
       .then((user) => {
         return user.update({
           password: password,

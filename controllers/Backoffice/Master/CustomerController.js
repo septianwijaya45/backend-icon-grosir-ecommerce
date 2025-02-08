@@ -123,75 +123,89 @@ const getCustomerById = asyncHandler(async (req, res) => {
 })
 
 const updateCustomer = asyncHandler( async (req, res) => {
-    try {
-        const { uuid } = req.params;
-        const {
-          username,
-          email,
-          password,
-          picture,
-          first_name,
-          last_name,
-          no_telepon,
-          alamat,
-          kota,
-          kode_pos,
-        } = req.body;
+  try {
+      const { uuid } = req.params;
+      const {
+        username,
+        email,
+        password,
+        picture,
+        first_name,
+        last_name,
+        no_telepon,
+        alamat,
+        kota,
+        kode_pos,
+      } = req.body;
 
-        const account = {
-          uuid: uuidv4(),
-          role_id: 3,
-          username: username,
-          email: email,
-          password: password,
-          picture: !picture ? "default.png" : picture,
-        };
+      const account = {
+        uuid: uuidv4(),
+        role_id: 3,
+        username: username,
+        email: email,
+        password: password,
+        picture: !picture ? "default.png" : picture,
+      };
 
-        const customerData = {
-          first_name: first_name,
-          last_name: last_name,
-          no_telepon: no_telepon,
-          alamat: alamat,
-          kota: kota,
-          kode_pos: kode_pos,
-        };
+      const customerData = {
+        first_name: first_name,
+        last_name: last_name,
+        no_telepon: no_telepon,
+        alamat: alamat,
+        kota: kota,
+        kode_pos: kode_pos,
+      };
 
-        await User_Ecommerces.findOne({ uuid: uuid })
-          .then((user) => {
-            return user.update(account);
-          })
-          .then((updateUser) => {
-            return M_Customers.findOne({
-              where: { user_ecommerce_id: updateUser.id },
-            });
-          })
-          .then((customer) => {
-            if (customer) {
-              return customer.update(customerData);
-            }
-            console.log("Tidak ada entri customer yang sesuai untuk diperbarui");
-          })
-          .catch((error) => {
-            console.error("Error updating data:", error);
-          });
+      const user = await User_Ecommerces.findOne({
+        where: {
+          uuid: uuid,
+        }
+      });
 
+      console.log(uuid)
 
-        return res.status(200).json({
-          message: "Data Berhasil Diupdate!",
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
         });
-    } catch (error) {
-        console.error(error.message);
-        return res.status(500).json({
-          message: "Internal Server Error! Please Contact Developer",
+      }
+
+      const updateUser = await user.update(account);
+
+      const customer = await M_Customers.findOne({
+        where: { user_ecommerce_id: updateUser.id },
+      });
+
+      if (!customer) {
+        return res.status(404).json({
+          message: "Customer not found",
         });
-    }
-})
+      }
+
+      await customer.update(customerData);
+
+      return res.status(200).json({
+        message: "Data Berhasil Diupdate!",
+      });
+
+  } catch (error) {
+      console.error(error.message);
+      return res.status(500).json({
+        message: "Internal Server Error! Please Contact Developer",
+      });
+  }
+});
+
 
 const deleteCustomer = asyncHandler(async (req, res) => {
   try {
     const { uuid } = req.params;
 
-    let user = await User_Ecommerces.findOne({ uuid: uuid });
+    let user = await User_Ecommerces.findOne({
+      where: {
+        uuid: uuid,
+      }
+    });
 
     if (!user) {
       return res.status(500).json({
@@ -202,6 +216,7 @@ const deleteCustomer = asyncHandler(async (req, res) => {
     const customer = await M_Customers.findOne({
       where: { user_ecommerce_id: user.id },
     });
+    
     if (customer) {
       await customer.destroy();
     }

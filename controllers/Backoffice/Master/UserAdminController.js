@@ -123,10 +123,13 @@ const updateAdminUser = asyncHandler(async (req, res) => {
       no_telepon,
     } = req.body;
 
-    let dataAdminUser = await Users.findOne({ uuid: uuid });
+    // Find the user by uuid
+    const dataAdminUser = await Users.findOne({
+      where: { uuid: uuid },
+    });
 
     if (!dataAdminUser) {
-      return res.status(500).json({
+      return res.status(404).json({
         message: "Data Tidak Ditemukan!",
       });
     }
@@ -145,23 +148,23 @@ const updateAdminUser = asyncHandler(async (req, res) => {
       no_telepon: no_telepon,
     };
 
-    await Users.findOne({ uuid: uuid })
-      .then((user) => {
-        return user.update(userData);
-      })
-      .then((updatedUser) => {
-        return M_Admins.findOne({ where: { user_id: updatedUser.id } });
-      })
-      .then((admin) => {
-        if (admin) {
-          return admin.update(adminData);
-        }
-        console.log("Tidak ada entri Admin yang sesuai untuk diperbarui");
-      })
-      .catch((error) => {
-        console.error("Error updating data:", error);
-      });
+    // Update user data
+    const updatedUser = await dataAdminUser.update(userData);
 
+    // Find the corresponding admin data
+    const admin = await M_Admins.findOne({ where: { user_id: updatedUser.id } });
+
+    if (!admin) {
+      console.log("Tidak ada entri Admin yang sesuai untuk diperbarui");
+      return res.status(404).json({
+        message: "Admin data not found for this user",
+      });
+    }
+
+    // Update admin data
+    await admin.update(adminData);
+
+    // Return success response
     return res.status(200).json({
       message: "Data Berhasil Diupdate!",
     });
@@ -173,11 +176,16 @@ const updateAdminUser = asyncHandler(async (req, res) => {
   }
 });
 
+
 const deleteAdminUser = asyncHandler(async (req, res) => {
   try {
     const { uuid } = req.params;
 
-    let user = await Users.findOne({ uuid: uuid });
+    let user = await Users.findOne({
+      where: {
+        uuid: uuid,
+      }
+    });
 
     if (!user) {
       return res.status(500).json({
