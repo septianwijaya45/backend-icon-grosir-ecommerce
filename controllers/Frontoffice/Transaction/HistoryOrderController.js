@@ -50,7 +50,7 @@ const getHistoryTransaction = asyncHandler(async (req, res) => {
             INNER JOIN
                 M_Ekspedisis as me ON me.id = t.ekspedisi_id
             LEFT JOIN
-                m_customers as c ON c.user_ecommerce_id = t.user_ecommerce_id
+                M_Customers as c ON c.user_ecommerce_id = t.user_ecommerce_id
             LEFT JOIN 
                 M_Variations as v ON td.variation_id = v.id AND v.deletedAt IS NULL
             WHERE 
