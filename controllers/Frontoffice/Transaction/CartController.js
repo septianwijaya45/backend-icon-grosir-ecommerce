@@ -431,21 +431,23 @@ const updateCart = asyncHandler(async (req, res) => {
             totalHarga += detail.price * detail.qty;
         }
 
-        if(qty > checkQty.stock){
+        if (qty > checkQty.stock) {
           return res.status(200).json({
-            message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${newQty}!`,
+            message: `Produk berhasil ditambahkan ke keranjang, tetapi stok yang tersedia hanya ${newQty} pcs.`,
             status: true,
             totalHarga: totalHarga,
-            newQty: newQty
+            newQty: newQty,
+            stokKurang: true
           });
-        }else{
+        } else {
           return res.status(200).json({
-            message: "Berhasil Menambahkan ke Keranjang Anda, Silahkan Checkout!",
+            message: "Produk berhasil ditambahkan ke keranjang. Silakan lanjutkan ke checkout!",
             status: true,
             totalHarga: totalHarga,
-            newQty: newQty
-          });        
-        } 
+            newQty: newQty,
+            stokKurang: false
+          });
+        }
     } catch (error) {
         console.error("Error fetching cart:", error);
         return res.status(500).json({
