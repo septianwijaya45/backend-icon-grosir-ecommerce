@@ -441,7 +441,7 @@ const updateCart = asyncHandler(async (req, res) => {
           });
         } else {
           return res.status(200).json({
-            message: "Produk berhasil ditambahkan ke keranjang. Silakan lanjutkan ke checkout!",
+            message: "Qty produk berhasil diupdate, Silakan lanjutkan ke checkout!",
             status: true,
             totalHarga: totalHarga,
             newQty: newQty,
