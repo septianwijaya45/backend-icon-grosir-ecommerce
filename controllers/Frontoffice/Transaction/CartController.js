@@ -275,6 +275,14 @@ const createWishlistCart = asyncHandler(async (req, res) => {
           attributes: ['stock']
         })
 
+        if(checkQty.stock == 0){
+          return res.status(200).json({
+            message: `Gagal Menambahkan ke Keranjang Anda, Stok Kosong!`,
+            status: false,
+            stock: checkQty.stock
+          });
+        }
+
         if(!checkCart){
             const cart = await T_Carts.create({
                 user_ecommerce_id: user.id,
@@ -291,17 +299,62 @@ const createWishlistCart = asyncHandler(async (req, res) => {
                 warna: checkWishlistDetail.warna,
                 ukuran: checkWishlistDetail.ukuran,
             })
+
+            let newStock = checkQty.stock - qty;
+            await T_Stocks.update(
+                { stock: newStock },
+                {
+                    where: {
+                        product_id: product.id,
+                        variation_id: variantBarangDetails.variation_id,
+                        warna: warna,
+                        ukuran: ukuran
+                    }
+                }
+            );
         }else{
-            const cartDetail = await T_Cart_Details.create({
-                cart_id: checkCart.id,
-                product_id: checkWishlistDetail.product_id,
-                variant_id: checkWishlistDetail.variant_id,
-                price: checkWishlistDetail.price,
-                qty: (checkWishlistDetail.qty > checkQty.stock) ? checkQty.stock : checkWishlistDetail.qty,
-                varian: checkWishlistDetail.varian,
-                warna: checkWishlistDetail.warna,
-                ukuran: checkWishlistDetail.ukuran,
-            })
+          const checkCartDetail = await T_Cart_Details.findOne({
+            cart_id: checkCart.id,
+            product_id: checkWishlistDetail.product_id,
+            variant_id: checkWishlistDetail.variant_id,
+            varian: checkWishlistDetail.varian,
+            warna: checkWishlistDetail.warna,
+            ukuran: checkWishlistDetail.ukuran,
+            deletedAt: null
+          });
+
+          if(checkCartDetail){
+            return res.status(400).json({
+              message: `Gagal menambahkan ke keranjang. Produk ini sudah ada di keranjang Anda!`,
+              status: false,
+              stock: checkQty.stock
+            });
+          }
+            
+          const cartDetail = await T_Cart_Details.create({
+              cart_id: checkCart.id,
+              product_id: checkWishlistDetail.product_id,
+              variant_id: checkWishlistDetail.variant_id,
+              price: checkWishlistDetail.price,
+              qty: (checkWishlistDetail.qty > checkQty.stock) ? checkQty.stock : checkWishlistDetail.qty,
+              varian: checkWishlistDetail.varian,
+              warna: checkWishlistDetail.warna,
+              ukuran: checkWishlistDetail.ukuran,
+          })
+
+            
+          let newStock = checkQty.stock - qty;
+          await T_Stocks.update(
+              { stock: newStock },
+              {
+                  where: {
+                      product_id: product.id,
+                      variation_id: variantBarangDetails.variation_id,
+                      warna: warna,
+                      ukuran: ukuran
+                  }
+              }
+          );
         }
 
         await T_Wishlist_Details.destroy({
@@ -320,9 +373,9 @@ const createWishlistCart = asyncHandler(async (req, res) => {
         }
 
         if(checkWishlistDetail.qty > checkQty.stock){
-          return res.status(200).json({
-            message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
-            status: true,
+          return res.status(400).json({
+            message: `Gagal Menambahkan ke Keranjang Anda, Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+            status: false,
             stock: checkQty.stock
           });
         }else{
@@ -335,6 +388,8 @@ const createWishlistCart = asyncHandler(async (req, res) => {
         console.error(error.message);
         return res.status(500).json({
           message: "Internal Server Error! Please Contact Developer",
+          status: false,
+          stock: 0
         });
       }
 })
@@ -409,37 +464,50 @@ const updateCart = asyncHandler(async (req, res) => {
           newQty = checkQty.stock
         }
         
-        const update = await T_Cart_Details.update(
-            { qty: newQty },
-            { 
-              where: { 
-                id: id, 
-                cart_id: getCart.id, 
-                product_id: product.id, 
-                varian: variant_id 
-              } 
-            }
-        );
-        
-        const cartDetails = await T_Cart_Details.findAll({
-            where: { cart_id: getCart.id, deletedAt: null },
-            attributes: ['price', 'qty']
-        });
-        
-        let totalHarga = 0;
-        for (let detail of cartDetails) {
-            totalHarga += detail.price * detail.qty;
-        }
 
         if (qty > checkQty.stock) {
           return res.status(200).json({
-            message: `Produk berhasil ditambahkan ke keranjang, tetapi stok yang tersedia hanya ${newQty} pcs.`,
-            status: true,
+            message: `Gagal Menambahkan ke Keranjang Anda, Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+            status: false,
+            stock: checkQty.stock,
+            stokKurang: true,
             totalHarga: totalHarga,
-            newQty: newQty,
-            stokKurang: true
           });
         } else {
+          const update = await T_Cart_Details.update(
+              { qty: newQty },
+              { 
+                where: { 
+                  id: id, 
+                  cart_id: getCart.id, 
+                  product_id: product.id, 
+                  varian: variant_id 
+                } 
+              }
+          );
+          
+          const cartDetails = await T_Cart_Details.findAll({
+              where: { cart_id: getCart.id, deletedAt: null }
+          });
+
+          let newStock = checkQty.stock + updateDetail.qty - qty;
+          await T_Stocks.update(
+              { stock: newStock },
+              {
+                  where: {
+                      product_id: product.id,
+                      variation_id: updateDetail.variant_id,
+                      warna: updateDetail.warna,
+                      ukuran: updateDetail.ukuran
+                  }
+              }
+          );
+          
+          let totalHarga = 0;
+          for (let detail of cartDetails) {
+              totalHarga += detail.price * detail.qty;
+          }
+
           return res.status(200).json({
             message: "Qty produk berhasil diupdate, Silakan lanjutkan ke checkout!",
             status: true,
@@ -458,6 +526,7 @@ const updateCart = asyncHandler(async (req, res) => {
 })
 
 const deleteCart = asyncHandler(async (req, res) => {
+  console.log('masuk deleteCart')
     try {
       const { id } = req.params;
   
@@ -473,10 +542,37 @@ const deleteCart = asyncHandler(async (req, res) => {
         });
       }
   
-      const checkCartDetail = T_Cart_Details.findAll({
-        where: {cart_id: CartDetail.cart_id},
-        attributes: ['id']
+      const checkCartDetail = await T_Cart_Details.findAll({
+        where: {cart_id: CartDetail.cart_id}
       });
+
+      for (const item of checkCartDetail) {
+        let checkQty = await T_Stocks.findOne({
+            where: {
+                product_id: item.product_id,
+                variation_id: item.variant_id,
+                warna: item.warna,
+                ukuran: item.ukuran
+            },
+            attributes: ['stock']
+        });
+    
+        if (checkQty) {
+            let addStockCartDetail = checkQty.stock + item.qty;
+    
+            await T_Stocks.update(
+                { stock: addStockCartDetail },
+                {
+                    where: {
+                        product_id: item.product_id,
+                        variation_id: item.variant_id,
+                        warna: item.warna,
+                        ukuran: item.ukuran
+                    }
+                }
+            );
+        }
+      }
   
       await T_Cart_Details.destroy({
         where: {id: CartDetail.id}
@@ -815,7 +911,8 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
       if(checkQty.stock == 0){
         return res.status(200).json({
           message: `Gagal Menambahkan ke Keranjang Anda, Stok Kosong!`,
-          status: false
+          status: false,
+          stock: checkQty.stock
         });
       }
 
@@ -834,23 +931,67 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
               warna: warna,
               ukuran: ukuran
           })
+
+          let newStock = checkQty.stock - qty;
+          await T_Stocks.update(
+            { stock: newStock },
+            {
+                where: {
+                    product_id: product.id,
+                    variation_id: variantBarangDetails.variation_id,
+                    warna: warna,
+                    ukuran: ukuran
+                }
+            }
+          );
       }else{
-          const cartDetail = await T_Cart_Details.create({
-              cart_id: checkCart.id,
-              product_id: product.id,
-              variant_id: variantBarangDetails.variation_id,
-              price     : variantBarangDetails.harga,
-              qty       : (qty > checkQty.stock) ? checkQty.stock : qty,
-              varian: variant_id,
-              warna: warna,
-              ukuran: ukuran
-          })
+        const checkCartDetail = await T_Cart_Details.findOne({
+          cart_id: checkCart.id,
+          product_id: product.id,
+          variant_id: variantBarangDetails.variation_id,
+          varian: variant_id,
+          warna: warna,
+          ukuran: ukuran,
+          deletedAt: null
+        });
+
+        if(checkCartDetail){
+          return res.status(400).json({
+            message: `Gagal menambahkan ke keranjang. Produk ini sudah ada di keranjang Anda!`,
+            status: false,
+            stock: checkQty.stock
+          });
+        }
+
+        const cartDetail = await T_Cart_Details.create({
+            cart_id: checkCart.id,
+            product_id: product.id,
+            variant_id: variantBarangDetails.variation_id,
+            price     : variantBarangDetails.harga,
+            qty       : (qty > checkQty.stock) ? checkQty.stock : qty,
+            varian: variant_id,
+            warna: warna,
+            ukuran: ukuran
+        })
+
+        let newStock = checkQty.stock - qty;
+        await T_Stocks.update(
+            { stock: newStock },
+            {
+                where: {
+                    product_id: product.id,
+                    variation_id: variantBarangDetails.variation_id,
+                    warna: warna,
+                    ukuran: ukuran
+                }
+            }
+        );
       }
 
       if(qty > checkQty.stock){
         return res.status(200).json({
-          message: `Berhasil Menambahkan ke Keranjang Anda, Tetapi Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
-          status: true,
+          message: `Gagal Menambahkan ke Keranjang Anda, Stok Hanya Tersedia Sebanyak: ${checkQty.stock}!`,
+          status: false,
           stock: checkQty.stock
         });
       }else{
@@ -861,9 +1002,12 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
       }      
 
   } catch (error) {
+      console.log('masuk error')
       console.error(error.message);
       return res.status(500).json({
         message: "Internal Server Error! Please Contact Developer",
+        status: false,
+        stock: 0
       });
     }
 })
