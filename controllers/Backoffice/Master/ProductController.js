@@ -378,8 +378,8 @@ const updateProduct = asyncHandler(async (req, res) => {
               warna: warnaBefore[i],
               ukuran: ukuranBefore[i],
             },
-          }).then((stok) => {
-            return stok.update({
+          }).then((stokUpdate) => {
+            return stokUpdate.update({
               variation_id: getVarian.id,
               product_id: product.id,
               warna: warna[i],
@@ -424,33 +424,54 @@ const updateProduct = asyncHandler(async (req, res) => {
           });
 
           // delete foto sebelumnya
-          let checkProduct = await M_Photo_Products.findOne({
-            where: {
-              product_id: product.id,
-              varian_product_detail_id: getVarianProductDetail.id,
-            }
-          });
-
-          if(checkProduct){
-            await M_Photo_Products.destroy({
+          if(varian_detail_id.length == 0){
+            let checkProduct = await M_Photo_Products.findOne({
               where: {
                 product_id: product.id,
                 varian_product_detail_id: getVarianProductDetail.id,
               }
-            });            
+            }).then((photoUpdate) =>{
+              if(photoUpdate == null){
+                return M_Photo_Products.create({
+                  product_id: product.id,
+                  varian_product_detail_id: getVarianProductDetail.id,
+                  nama_file: foto[i],
+                });
+              } else if(photoUpdate.nama_file != null){
+                if(foto[i] != '-'){
+                  return photoUpdate.update({
+                    nama_file: foto[i]
+                  })
+                }
+              }
+            });
           }
 
-          varian_detail_id.forEach(async (id) => {
-            if (foto['foto-' + id] != null && foto['foto-' + id] != '') {
-              await M_Photo_Products.create({
-                product_id: product.id,
-                varian_product_detail_id: getVarianProductDetail.id,
-                nama_file: foto['foto-' + id],
-              });
-            }
-          });
           
         }
+      }
+
+      if(varian_detail_id.length != 0){
+        varian_detail_id.forEach(async (id) => {
+            await M_Photo_Products.findOne({
+              where: {
+                product_id: product.id,
+                varian_product_detail_id: id,
+              }
+            }).then((photoUpdate) =>{
+              if(photoUpdate == null){
+                return M_Photo_Products.create({
+                  product_id: product.id,
+                  varian_product_detail_id: id,
+                  nama_file: foto['foto-' + id],
+                });
+              } else if (foto['foto-' + id] != null && foto['foto-' + id] != '') {
+                  return photoUpdate.update({
+                    nama_file: foto['foto-' + id] 
+                  })
+              }
+            });
+        });
       }
     }
 

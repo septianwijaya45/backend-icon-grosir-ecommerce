@@ -314,13 +314,15 @@ const createWishlistCart = asyncHandler(async (req, res) => {
             );
         }else{
           const checkCartDetail = await T_Cart_Details.findOne({
-            cart_id: checkCart.id,
-            product_id: checkWishlistDetail.product_id,
-            variant_id: checkWishlistDetail.variant_id,
-            varian: checkWishlistDetail.varian,
-            warna: checkWishlistDetail.warna,
-            ukuran: checkWishlistDetail.ukuran,
-            deletedAt: null
+            where: {
+              cart_id: checkCart.id,
+              product_id: checkWishlistDetail.product_id,
+              variant_id: checkWishlistDetail.variant_id,
+              varian: checkWishlistDetail.varian,
+              warna: checkWishlistDetail.warna,
+              ukuran: checkWishlistDetail.ukuran,
+              deletedAt: null
+            }
           });
 
           if(checkCartDetail){
@@ -945,15 +947,19 @@ const createCartByDetailProduct = asyncHandler(async (req, res) => {
             }
           );
       }else{
+        console.log("Msuk else cart controller, warna: "+warna)
         const checkCartDetail = await T_Cart_Details.findOne({
-          cart_id: checkCart.id,
-          product_id: product.id,
-          variant_id: variantBarangDetails.variation_id,
-          varian: variant_id,
-          warna: warna,
-          ukuran: ukuran,
-          deletedAt: null
+          where: {
+            cart_id: checkCart.id,
+            product_id: product.id,
+            variant_id: variantBarangDetails.variation_id,
+            varian: variant_id,
+            warna: warna,
+            ukuran: ukuran,
+            deletedAt: null
+          }
         });
+        console.log(checkCartDetail)
 
         if(checkCartDetail){
           return res.status(400).json({
