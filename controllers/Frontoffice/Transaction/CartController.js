@@ -635,14 +635,14 @@ const getWarnaById = asyncHandler(async(req, res) => {
       }
     })
 
-    await T_Cart_Details.update({
-      varian: variant_id,
-    }, {
-      where: {
-        id: cart,
-        product_id: productDetail.id
-      }
-    })
+    // await T_Cart_Details.update({
+    //   varian: variant_id,
+    // }, {
+    //   where: {
+    //     id: cart,
+    //     product_id: productDetail.id
+    //   }
+    // })
 
     const variantBarangDetails = await M_Variant_Product_Detail.findAll({
       where: {
@@ -671,15 +671,15 @@ const getUkuranById = asyncHandler(async(req, res) => {
       }
     })
 
-    await T_Cart_Details.update({
-      warna: warna
-    }, {
-      where: {
-        id: cart,
-        product_id: productDetail.id,
-        varian: variant_id
-      }
-    })
+    // await T_Cart_Details.update({
+    //   warna: warna
+    // }, {
+    //   where: {
+    //     id: cart,
+    //     product_id: productDetail.id,
+    //     varian: variant_id
+    //   }
+    // })
 
     const variantBarangDetails = await M_Variant_Product_Detail.findAll({
       where: {
@@ -711,16 +711,16 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     })
 
-    await T_Cart_Details.update({
-      ukuran: ukuran,
-    }, {
-      where: {
-        id: cart,
-        product_id: productDetail.id,
-        varian: variant_id,
-        warna: warna
-      }
-    })
+    // await T_Cart_Details.update({
+    //   ukuran: ukuran,
+    // }, {
+    //   where: {
+    //     id: cart,
+    //     product_id: productDetail.id,
+    //     varian: variant_id,
+    //     warna: warna
+    //   }
+    // })
 
     const variantBarangDetails = await M_Variant_Product_Detail.findOne({
       where: {
@@ -777,19 +777,19 @@ const getHargaById = asyncHandler(async(req, res) => {
       }
     }
 
-    await T_Cart_Details.update({
-      price: hargaProduct
-    }, {
-      where: {
-        id: cart,
-        product_id: productDetail.id,
-        varian: variant_id,
-        warna: warna,
-        ukuran: ukuran
-      }
-    })
+    // await T_Cart_Details.update({
+    //   price: hargaProduct
+    // }, {
+    //   where: {
+    //     id: cart,
+    //     product_id: productDetail.id,
+    //     varian: variant_id,
+    //     warna: warna,
+    //     ukuran: ukuran
+    //   }
+    // })
     
-    console.log('get-harga hargaProduct:'+hargaProduct);
+    // console.log('get-harga hargaProduct:'+hargaProduct);
     
     let arrayData = {
       harga: hargaProduct,
